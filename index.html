@@ -20,12 +20,13 @@
   <table id="jobTable">
     <thead>
       <tr>
+        <th>X</th>
         <th>Equip</th>
         <th>Description</th>
-        <th>Job Type</th>
-        <th>Start</th>
-        <th>End</th>
+        <th>Work Order</th>
         <th>Status</th>
+        <th>Remarks</th>
+        <th>Status Job</th>
         <th>Action</th>
       </tr>
    tbody></tbody>
@@ -37,10 +38,9 @@
     <h3>Add Line Item</h3>
     <form id="addForm">
       <input type="text" id="description" placeholder="Description" required />
-      <input type="text" id="jobType" placeholder="Job Type" required />
-      <input type="date" id="start" required />
-      <input type="date" id="end" required />
+      <input type="text" id="workOrder" placeholder="Work Order" required />
       <input type="text" id="status" placeholder="Status" />
+      <input type="text" id="remarks" placeholder="Remarks" />
       <button type="submit">Add</button>
     </form>
   </div>
