@@ -13,12 +13,12 @@ toggleBtn.addEventListener("click", () => {
 document.getElementById("addForm").addEventListener("submit", (e) => {
   e.preventDefault();
   const newItem = {
-    equip: "AUTO", // default or from selection
+    equip: "AUTO", // default atau bisa ditambahkan input
     description: document.getElementById("description").value,
-    jobType: document.getElementById("jobType").value,
-    start: document.getElementById("start").value,
-    end: document.getElementById("end").value,
-    status: document.getElementById("status").value
+    workOrder: document.getElementById("workOrder").value,
+    status: document.getElementById("status").value,
+    remarks: document.getElementById("remarks").value,
+    statusJob: ""
   };
   data.push(newItem);
   renderTable();
@@ -35,12 +35,13 @@ function renderTable() {
     const row = document.createElement("tr");
 
     row.innerHTML = `
+      <td><input type="checkbox" /></td>
       <td>${item.equip}</td>
       <td contenteditable="true">${item.description}</td>
-      <td contenteditable="true">${item.jobType}</td>
-      <td contenteditable="true">${item.start}</td>
-      <td contenteditable="true">${item.end}</td>
+      <td contenteditable="true">${item.workOrder}</td>
       <td contenteditable="true">${item.status}</td>
+      <td contenteditable="true">${item.remarks}</td>
+      <td>${item.statusJob}</td>
       <td><button onclick="editRow(${index})">Save</button></td>
     `;
 
@@ -52,11 +53,10 @@ function renderTable() {
 
 function editRow(index) {
   const row = tableBody.rows[index];
-  data[index].description = row.cells[1].textContent;
-  data[index].jobType = row.cells[2].textContent;
-  data[index].start = row.cells[3].textContent;
-  data[index].end = row.cells[4].textContent;
-  data[index].status = row.cells[5].textContent;
+  data[index].description = row.cells[2].textContent;
+  data[index].workOrder = row.cells[3].textContent;
+  data[index].status = row.cells[4].textContent;
+  data[index].remarks = row.cells[5].textContent;
 }
 
 function updateFilterOptions() {
