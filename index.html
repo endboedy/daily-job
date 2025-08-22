@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Deadstock CK BMB</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h2>Deadstock CK BMB List</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>X</th>
+        <th>Equip</th>
+        <th>Description</th>
+        <th>Work Order</th>
+        <th>Status</th>
+        <th>Remarks</th>
+        <th>Status Job</th>
+      </tr>
+    </thead>
+    <tbody id="item-list"></tbody>
+  </table>
+
+  <button onclick="showAddForm()">Add New</button>
+  <div id="add-form" style="display:none;">
+    <input placeholder="Equip" id="equip">
+    <textarea placeholder="Description (pisahkan dengan koma)" id="desc"></textarea>
+    <input placeholder="Work Order" id="wo">
+    <input placeholder="Status (pisahkan dengan koma)" id="status">
+    <select id="remarks">
+      <option value="">-- Remarks --</option>
+      <option value="OK">OK</option>
+      <option value="Need Review">Need Review</option>
+      <option value="Urgent">Urgent</option>
+    </select>
+    <button onclick="addItem()">Submit</button>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
