@@ -16,6 +16,7 @@
         <th>Status</th>
         <th>Remarks</th>
         <th>Status Job</th>
+        <th>Action</th>
       </tr>
     </thead>
     <tbody id="item-list"></tbody>
@@ -27,12 +28,7 @@
     <textarea placeholder="Description (pisahkan dengan koma)" id="desc"></textarea>
     <input placeholder="Work Order" id="wo">
     <input placeholder="Status (pisahkan dengan koma)" id="status">
-    <select id="remarks">
-      <option value="">-- Remarks --</option>
-      <option value="OK">OK</option>
-      <option value="Need Review">Need Review</option>
-      <option value="Urgent">Urgent</option>
-    </select>
+    <input placeholder="Remarks" id="remarks">
     <button onclick="addItem()">Submit</button>
   </div>
 
