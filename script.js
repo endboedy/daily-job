@@ -20,11 +20,18 @@ function renderList() {
     row.innerHTML = `
       <td><span class="toggle" onclick="toggle(${index})" id="toggle-${index}">[+]</span></td>
       <td>${item.Equip}</td>
-      <td><div id="desc-${index}" class="detail">${item.Description.split(',').join('<br>')}</div></td>
+      <td><div id="desc-${index}" class="detail">${item.Description.split(',').map(d => `<div>${d}</div>`).join('')}</div></td>
       <td>${item.WorkOrder}</td>
-      <td><div id="status-${index}" class="detail">${statusList.join('<br>')}</div></td>
-      <td>${item.Remarks}</td>
+      <td><div id="status-${index}" class="detail">${statusList.map((s, i) => `
+        <select id="status-${index}-${i}">
+          ${["IP", "YTS", "W/P", "W/L", "W/T", "C"].map(opt => `<option value="${opt}" ${opt === s ? 'selected' : ''}>${opt}</option>`).join('')}
+        </select>`).join('')}</div></td>
+      <td><input type="text" value="${item.Remarks}" id="remarks-${index}" /></td>
       <td>${statusJob}</td>
+      <td>
+        <button onclick="saveItem(${index})">Save</button>
+        <button onclick="deleteItem(${index})">Delete</button>
+      </td>
     `;
     container.appendChild(row);
   });
@@ -56,4 +63,19 @@ function addItem() {
   data.push(newItem);
   renderList();
   document.getElementById("add-form").style.display = "none";
+}
+
+function saveItem(index) {
+  const statusDropdowns = document.querySelectorAll(`[id^="status-${index}-"]`);
+  const newStatus = Array.from(statusDropdowns).map(s => s.value).join(',');
+  const newRemarks = document.getElementById(`remarks-${index}`).value;
+
+  data[index].Status = newStatus;
+  data[index].Remarks = newRemarks;
+  renderList();
+}
+
+function deleteItem(index) {
+  data.splice(index, 1);
+  renderList();
 }
