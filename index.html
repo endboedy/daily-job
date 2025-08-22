@@ -22,21 +22,22 @@
       <tr>
         <th>X</th>
         <th>Equip</th>
-        <th>Description</th>
+       >Description</th>
         <th>Work Order</th>
         <th>Status</th>
         <th>Remarks</th>
         <th>Status Job</th>
         <th>Action</th>
       </tr>
-   tbody></tbody>
+    </thead>
+    <tbody></tbody>
   </table>
 
-  <button id="toggleForm">+</button>
+  <button id="toggleForm">Add New Job</button>
 
   <div id="formContainer" class="hidden">
-    <h3>Add Line Item</h3>
     <form id="addForm">
+      <input type="text" id="equip" placeholder="Equip" required />
       <input type="text" id="description" placeholder="Description" required />
       <input type="text" id="workOrder" placeholder="Work Order" required />
       <input type="text" id="status" placeholder="Status" />
