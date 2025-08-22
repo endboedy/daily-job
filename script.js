@@ -1,81 +1,73 @@
 
 let data = [];
+const tableBody = document.querySelector("#jobTable tbody");
+const formContainer = document.getElementById("formContainer");
+const toggleBtn = document.getElementById("toggleForm");
+const filterEquip = document.getElementById("filterEquip");
 
-fetch('data.json')
-  .then(response => response.json())
-  .then(json => {
-    data = json;
-    renderList();
-  });
+toggleBtn.addEventListener("click", () => {
+  formContainer.classList.toggle("hidden");
+  toggleBtn.textContent = formContainer.classList.contains("hidden") ? "+" : "-";
+});
 
-function renderList() {
-  const container = document.getElementById("item-list");
-  container.innerHTML = "";
-  data.forEach((item, index) => {
-    const statusList = item.Status.split(',').map(s => s.trim());
-    const cCount = statusList.filter(s => s === 'C').length;
-    const statusJob = statusList.length > 0 ? Math.round((cCount / statusList.length) * 100) + "%" : "0%";
-
-    const row = document.createElement("tr");
-    row.innerHTML = `
-      <td><span class="toggle" onclick="toggle(${index})" id="toggle-${index}">[+]</span></td>
-      <td>${item.Equip}</td>
-      <td><div id="desc-${index}" class="detail">${item.Description.split(',').map(d => `<div>${d}</div>`).join('')}</div></td>
-      <td>${item.WorkOrder}</td>
-      <td><div id="status-${index}" class="detail">${statusList.map((s, i) => `
-        <select id="status-${index}-${i}">
-          ${["IP", "YTS", "W/P", "W/L", "W/T", "C"].map(opt => `<option value="${opt}" ${opt === s ? 'selected' : ''}>${opt}</option>`).join('')}
-        </select>`).join('')}</div></td>
-      <td><input type="text" value="${item.Remarks}" id="remarks-${index}" /></td>
-      <td>${statusJob}</td>
-      <td>
-        <button onclick="saveItem(${index})">Save</button>
-        <button onclick="deleteItem(${index})">Delete</button>
-      </td>
-    `;
-    container.appendChild(row);
-  });
-}
-
-function toggle(index) {
-  const desc = document.getElementById(`desc-${index}`);
-  const status = document.getElementById(`status-${index}`);
-  const toggleBtn = document.getElementById(`toggle-${index}`);
-  const isHidden = desc.style.display === "none";
-
-  desc.style.display = isHidden ? "block" : "none";
-  status.style.display = isHidden ? "block" : "none";
-  toggleBtn.innerText = isHidden ? "[-]" : "[+]";
-}
-
-function showAddForm() {
-  document.getElementById("add-form").style.display = "block";
-}
-
-function addItem() {
+document.getElementById("addForm").addEventListener("submit", (e) => {
+  e.preventDefault();
   const newItem = {
-    Equip: document.getElementById("equip").value,
-    Description: document.getElementById("desc").value,
-    WorkOrder: document.getElementById("wo").value,
-    Status: document.getElementById("status").value,
-    Remarks: document.getElementById("remarks").value
+    equip: "AUTO", // default or from selection
+    description: document.getElementById("description").value,
+    jobType: document.getElementById("jobType").value,
+    start: document.getElementById("start").value,
+    end: document.getElementById("end").value,
+    status: document.getElementById("status").value
   };
   data.push(newItem);
-  renderList();
-  document.getElementById("add-form").style.display = "none";
+  renderTable();
+  e.target.reset();
+});
+
+function renderTable() {
+  tableBody.innerHTML = "";
+  const filtered = filterEquip.value
+    ? data.filter((d) => d.equip === filterEquip.value)
+    : data;
+
+  filtered.forEach((item, index) => {
+    const row = document.createElement("tr");
+
+    row.innerHTML = `
+      <td>${item.equip}</td>
+      <td contenteditable="true">${item.description}</td>
+      <td contenteditable="true">${item.jobType}</td>
+      <td contenteditable="true">${item.start}</td>
+      <td contenteditable="true">${item.end}</td>
+      <td contenteditable="true">${item.status}</td>
+      <td><button onclick="editRow(${index})">Save</button></td>
+    `;
+
+    tableBody.appendChild(row);
+  });
+
+  updateFilterOptions();
 }
 
-function saveItem(index) {
-  const statusDropdowns = document.querySelectorAll(`[id^="status-${index}-"]`);
-  const newStatus = Array.from(statusDropdowns).map(s => s.value).join(',');
-  const newRemarks = document.getElementById(`remarks-${index}`).value;
-
-  data[index].Status = newStatus;
-  data[index].Remarks = newRemarks;
-  renderList();
+function editRow(index) {
+  const row = tableBody.rows[index];
+  data[index].description = row.cells[1].textContent;
+  data[index].jobType = row.cells[2].textContent;
+  data[index].start = row.cells[3].textContent;
+  data[index].end = row.cells[4].textContent;
+  data[index].status = row.cells[5].textContent;
 }
 
-function deleteItem(index) {
-  data.splice(index, 1);
-  renderList();
+function updateFilterOptions() {
+  const equips = [...new Set(data.map((d) => d.equip))];
+  filterEquip.innerHTML = `<option value="">All</option>`;
+  equips.forEach((eq) => {
+    const opt = document.createElement("option");
+    opt.value = eq;
+    opt.textContent = eq;
+    filterEquip.appendChild(opt);
+  });
 }
+
+filterEquip.addEventListener("change", renderTable);
