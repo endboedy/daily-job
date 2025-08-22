@@ -19,12 +19,12 @@ table {
 
 th, td {
   border: 1px solid #ccc;
-  padding: 8px;
+  padding: 6px;
   text-align: left;
 }
 
 thead {
-  background-color: #e0e0e0;
+  background-color: #d0e0f0;
 }
 
 tbody tr:nth-child(even) {
