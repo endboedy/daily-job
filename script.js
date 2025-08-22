@@ -1,4 +1,3 @@
-
 let jobs = [];
 const tableBody = document.querySelector("#jobTable tbody");
 const formContainer = document.getElementById("formContainer");
@@ -61,8 +60,11 @@ function renderTable() {
           <td contenteditable="true">${line.workOrder}</td>
           <td contenteditable="true">${line.status}</td>
           <td contenteditable="true">${line.remarks}</td>
-          <td>${job.statusJob}</td>
-          <td><button onclick="saveLine(${index}, ${lineIndex})">Save</button></td>
+          <td></td>
+          <td>
+            <button onclick="saveLine(${index}, ${lineIndex})">Save</button>
+            <button onclick="deleteLine(${index}, ${lineIndex})">Delete</button>
+          </td>
         `;
         tableBody.appendChild(lineRow);
       });
@@ -94,6 +96,11 @@ function saveLine(jobIndex, lineIndex) {
   jobs[jobIndex].lines[lineIndex].workOrder = cells[3].textContent;
   jobs[jobIndex].lines[lineIndex].status = cells[4].textContent;
   jobs[jobIndex].lines[lineIndex].remarks = cells[5].textContent;
+  renderTable();
+}
+
+function deleteLine(jobIndex, lineIndex) {
+  jobs[jobIndex].lines.splice(lineIndex, 1);
   renderTable();
 }
 
