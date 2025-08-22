@@ -1,36 +1,50 @@
 
 body {
-  font-family: 'Aptos Narrow', sans-serif;
-  font-size: 11pt;
+  font-family: "Aptos Narrow", sans-serif;
+  font-size: 10pt;
+  background-color: #f4f7fa;
   margin: 20px;
 }
+
+h1 {
+  text-align: center;
+  color: #333;
+}
+
 table {
   width: 100%;
   border-collapse: collapse;
-}
-th, td {
-  border: 1px solid #ccc;
-  padding: 6px;
-  text-align: left;
-  vertical-align: top;
-}
-.toggle {
-  cursor: pointer;
-  font-weight: bold;
-}
-.detail {
-  display: none;
-}
-#add-form {
   margin-top: 20px;
 }
-input, textarea, select {
-  margin: 4px;
-  padding: 4px;
-  font-size: 11pt;
+
+th, td {
+  border: 1px solid #ccc;
+  padding: 8px;
+  text-align: left;
 }
+
+thead {
+  background-color: #e0e0e0;
+}
+
+tbody tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+tbody tr:nth-child(odd) {
+  background-color: #ffffff;
+}
+
 button {
-  margin: 4px;
+  margin-top: 10px;
   padding: 6px 12px;
-  font-size: 11pt;
+  font-size: 10pt;
+}
+
+.hidden {
+  display: none;
+}
+
+.filter-container {
+  margin-bottom: 10px;
 }
