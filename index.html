@@ -1,37 +1,48 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Deadstock CK BMB</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Daily Job</title>
+  <link rel="stylesheet" href="style.css" />
+  <script defer src="script.js"></script>
 </head>
 <body>
-  <h2>Deadstock CK BMB List</h2>
-  <table>
-    <thead>
-      <tr>
-        <th>X</th>
-        <th>Equip</th>
-        <th>Description</th>
-        <th>Work Order</th>
-        <th>Status</th>
-        <th>Remarks</th>
-        <th>Status Job</th>
-        <th>Action</th>
-      </tr>
-    </thead>
-    <tbody id="item-list"></tbody>
-  </table>
+  <h1>Daily Job</h1>
 
-  <button onclick="showAddForm()">Add New</button>
-  <div id="add-form" style="display:none;">
-    <input placeholder="Equip" id="equip">
-    <textarea placeholder="Description (pisahkan dengan koma)" id="desc"></textarea>
-    <input placeholder="Work Order" id="wo">
-    <input placeholder="Status (pisahkan dengan koma)" id="status">
-    <input placeholder="Remarks" id="remarks">
-    <button onclick="addItem()">Submit</button>
+  <div class="filter-container">
+    <label for="filterEquip">Filter Equipment:</label>
+    <select id="filterEquip">
+      <option value="">All</option>
+    </select>
   </div>
 
-  <script src="script.js"></script>
+  <table id="jobTable">
+    <thead>
+      <tr>
+        <th>Equip</th>
+        <th>Description</th>
+        <th>Job Type</th>
+        <th>Start</th>
+        <th>End</th>
+        <th>Status</th>
+        <th>Action</th>
+      </tr>
+   tbody></tbody>
+  </table>
+
+  <button id="toggleForm">+</button>
+
+  <div id="formContainer" class="hidden">
+    <h3>Add Line Item</h3>
+    <form id="addForm">
+      <input type="text" id="description" placeholder="Description" required />
+      <input type="text" id="jobType" placeholder="Job Type" required />
+      <input type="date" id="start" required />
+      <input type="date" id="end" required />
+      <input type="text" id="status" placeholder="Status" />
+      <button type="submit">Add</button>
+    </form>
+  </div>
 </body>
 </html>
