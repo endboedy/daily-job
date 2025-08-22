@@ -1,90 +1,17 @@
+
 [
   {
-    "Project": "CK BMB",
-    "Plant": 3069,
-    "Material": 900032827,
-    "Room": "CO3293",
-    "Model": "775F-DLS",
-    "Material Description": "SHROUD;256-3624;CAT",
-    "Manufacture PN": "256-3624",
-    "Manufacture": "CAT",
-    "Sloc": "WH02",
-    "Plan Install": "Belum ada plan install",
-    "Remark": "unit  Done ARR"
+    "Equip": "CO4152",
+    "Description": "Sch PM 1000 Hrs, MRP Suspensi LH, MRP Suspensi Rh",
+    "WorkOrder": "49000123",
+    "Status": "C,C,C",
+    "Remarks": "OK"
   },
   {
-    "Project": "CK BMB",
-    "Plant": 3069,
-    "Material": 900042613,
-    "Room": "CO4396",
-    "Model": "777D-FKR",
-    "Material Description": "PARTS KIT;1000;9Z-01904K;CAT",
-    "Manufacture PN": "9Z-01904K",
-    "Manufacture": "CAT",
-    "Sloc": "WH01",
-    "Plan Install": "Belum ada plan install",
-    "Remark": ""
-  },
-  {
-    "Project": "CK BMB",
-    "Plant": 3069,
-    "Material": 900082969,
-    "Room": "XCT2858",
-    "Model": "H700-ZY5041A/T-DT",
-    "Material Description": "SHAFT;TRUNNION;S4943-E0090;HINO",
-    "Manufacture PN": "S4943-E0090",
-    "Manufacture": "HINO",
-    "Sloc": "WH01",
-    "Plan Install": "Belum ada plan install",
-    "Remark": "Unit Dispose Terminate"
-  },
-  {
-    "Project": "CK BMB",
-    "Plant": 3069,
-    "Material": 900072390,
-    "Room": "",
-    "Model": "",
-    "Material Description": "CYLINDER;2765681;CAT",
-    "Manufacture PN": 2765681,
-    "Manufacture": "CAT",
-    "Sloc": "WH01",
-    "Plan Install": "Belum ada plan install",
-    "Remark": ""
-  },
-  {
-    "Project": "CK BMB",
-    "Plant": 3069,
-    "Material": 900063617,
-    "Room": "CE4057",
-    "Model": "390FL-GAY",
-    "Material Description": "HORN;5616042;CAT",
-    "Manufacture PN": 5616042,
-    "Manufacture": "CAT",
-    "Sloc": "WH01",
-    "Plan Install": "Belum ada plan install",
-    "Remark": "unit  Dispose"
-  },
-  {
-    "Project": "CK BMB",
-    "Plant": 3069,
-    "Material": 900065426,
-    "Room": "CO4209",
-    "Model": "777D-FKR",
-    "Material Description": "SUSPENSION;3039406;CAT",
-    "Manufacture PN": 3039406,
-    "Manufacture": "CAT",
-    "Sloc": "WH01",
-    "Plan Install": "Belum ada plan install",
-    "Remark": ""
-  },
-  {
-    "Project": "CK BMB",
-    "Plant": 3069,
-    "Material": 900066899,
-    "Room": "XCT2830",
-    "Model": "H700-ZY5041A/T-DT",
-    "Material Description": "CLAMP,C;48141-E0670;HINO",
-    "Manufacture PN": "48141-E0670",
-    "Manufacture": "HINO",
-    "Sloc": "WH01",
-    "Plan Install": 
+    "Equip": "CO4143",
+    "Description": "Sch PM 240 Hrs, MRP Suspensi LH",
+    "WorkOrder": "49000456",
+    "Status": "C,IP",
+    "Remarks": "Need Review"
+  }
+]
