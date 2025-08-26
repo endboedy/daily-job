@@ -4,18 +4,18 @@
   <meta charset="UTF-8">
   <title>Monitoring Equipment</title>
   <style>
-    body { font-family: Arial, sans-serif; margin: 20px; }
+    body { font-family: Arial, sans-serif; margin: 20px; font-size: 12px; }
     h2 { margin-bottom: 10px; }
-    table { border-collapse: collapse; margin-bottom: 30px; width: 100%; }
-    th, td { border: 1px solid #999; padding: 6px; text-align: center; }
+    table { border-collapse: collapse; margin-bottom: 30px; width: 100%; font-weight: normal; }
+    th, td { border: 1px solid #999; padding: 4px; text-align: center; }
     th.small { width: 100px; }
     th.medium { width: 150px; }
-    th.large { width: 200px; }
-    .category-row { background: #eee; font-weight: bold; text-align: left; }
-    .btn { padding: 4px 10px; margin: 2px; cursor: pointer; background: #007bff; color: white; border: none; border-radius: 3px; }
+    th.large { width: 280px; } /* Action Plan lebih lebar */
+    .category-row { background: #ffeb99; text-align: left; font-weight: bold; }
+    .btn { padding: 2px 6px; margin: 2px; cursor: pointer; background: #007bff; color: white; border: none; border-radius: 3px; font-size: 11px; }
     .btn:hover { background: #0056b3; }
-    .action-btn { margin: 0 4px; cursor: pointer; color: blue; text-decoration: underline; }
-    input { width: 95%; padding: 3px; }
+    .action-btn { margin: 0 3px; cursor: pointer; color: blue; text-decoration: underline; font-size: 11px; }
+    input { width: 95%; padding: 2px; font-size: 12px; }
   </style>
 </head>
 <body>
@@ -29,11 +29,9 @@
 <script>
 const categories = ["Loading", "Hauling", "Auxiliary", "Coal Getting", "Dozing", "Grading", "Water Truck"]; 
 
-// inisialisasi data kosong berdasarkan kategori
 let data = {};
 categories.forEach(cat => data[cat] = []);
 
-// render table
 function renderTable() {
   const container = document.getElementById("tableContainer");
   container.innerHTML = "";
@@ -46,12 +44,12 @@ function renderTable() {
           <th class="small">Equipment</th>
           <th class="small">Actual Down Time</th>
           <th class="small">LTR Status</th>
-          <th class="large">Component Code</th>
           <th class="large">Action Plan</th>
+          <th class="medium">Component Code</th>
           <th class="medium">Location</th>
           <th class="small">BD Aging Days</th>
           <th class="small">Est RFU</th>
-          <th class="small">Aksi</th>
+          <th class="small">Action</th>
         </tr>
     `;
 
@@ -61,8 +59,8 @@ function renderTable() {
           <td>${row.equipment}</td>
           <td>${row.downTime}</td>
           <td>${row.ltr}</td>
-          <td>${row.compCode}</td>
           <td>${row.action}</td>
+          <td>${row.compCode}</td>
           <td>${row.loc}</td>
           <td>${row.bdAging}</td>
           <td>${row.rfu}</td>
@@ -74,9 +72,10 @@ function renderTable() {
     });
 
     html += `
-      <tr><td colspan="9" style="text-align:center;">
-        <button class="btn" onclick="addRow('${cat}')">+ Tambah Baris</button>
-      </td></tr>
+      <tr>
+        <td colspan="8"></td>
+        <td><button class="btn" onclick="addRow('${cat}')">+ Add</button></td>
+      </tr>
       </table>
     `;
 
@@ -97,13 +96,13 @@ function editRow(cat, idx) {
   const table = document.getElementById("tableContainer");
   const tables = table.getElementsByTagName("table");
   const rows = tables[categories.indexOf(cat)].rows;
-  const tr = rows[idx+2]; // offset header
+  const tr = rows[idx+2]; // header offset
   tr.innerHTML = `
     <td><input value="${row.equipment}"></td>
     <td><input type="date" value="${row.downTime}"></td>
     <td><input value="${row.ltr}"></td>
-    <td><input value="${row.compCode}"></td>
     <td><input value="${row.action}"></td>
+    <td><input value="${row.compCode}"></td>
     <td><input value="${row.loc}"></td>
     <td>${row.bdAging}</td>
     <td><input type="date" value="${row.rfu}"></td>
@@ -124,8 +123,8 @@ function saveRow(cat, idx, el) {
     equipment: inputs[0].value,
     downTime: down,
     ltr: inputs[2].value,
-    compCode: inputs[3].value,
-    action: inputs[4].value,
+    action: inputs[3].value,
+    compCode: inputs[4].value,
     loc: inputs[5].value,
     bdAging: bdAging,
     rfu: rfu
@@ -138,7 +137,6 @@ function deleteRow(cat, idx) {
   renderTable();
 }
 
-// save JSON
 document.getElementById("saveBtn").addEventListener("click", () => {
   const blob = new Blob([JSON.stringify(data)], {type: "application/json"});
   const a = document.createElement("a");
@@ -147,20 +145,17 @@ document.getElementById("saveBtn").addEventListener("click", () => {
   a.click();
 });
 
-// load JSON
 document.getElementById("loadFile").addEventListener("change", function(e){
   const file = e.target.files[0];
   const reader = new FileReader();
   reader.onload = () => {
     data = JSON.parse(reader.result);
-    // pastikan kategori dari file masih ada
     categories.forEach(cat => { if(!data[cat]) data[cat] = []; });
     renderTable();
   };
   reader.readAsText(file);
 });
 
-// pertama kali render
 renderTable();
 </script>
 </body>
