@@ -1,31 +1,52 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <title>Monitoring Equipment</title>
   <style>
-    body{font-family:Arial, sans-serif; margin:20px;}
-    table{width:100%; border-collapse:collapse; margin-top:10px;}
-    th,td{border:1px solid #aaa; padding:6px; font-size:14px;}
-    th{background:#f0f0f0;}
-    .actions button{margin:2px;}
-    .toolbar{margin-bottom:10px;}
-    input,select{width:100%; box-sizing:border-box;}
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    h2 { margin-bottom: 10px; }
+    table { border-collapse: collapse; width: 100%; margin-top: 10px; }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 6px;
+      text-align: left;
+    }
+    th { background: #eee; }
+    .category-row {
+      background: #ffd966;
+      font-weight: bold;
+      text-align: left;
+    }
+    input[type="text"], input[type="datetime-local"], input[type="date"] {
+      width: 100%;
+      box-sizing: border-box;
+    }
+    .aksi button {
+      margin-right: 4px;
+    }
+    /* Lebar kolom spesifik */
+    td.equipment { width: 80px; }
+    td.component { width: 150px; }
+    td.plan { width: 300px; }
+    td.location { width: 100px; }
+    td.aging { width: 80px; text-align: center; }
+    td.rfu { width: 120px; }
   </style>
 </head>
 <body>
-  <h2>📊 Monitoring Equipment</h2>
+  <h2>Monitoring Equipment</h2>
 
-  <div class="toolbar">
-    <button onclick="addRow()">➕ Tambah Baris</button>
-    <button onclick="exportJSON()">💾 Export JSON</button>
-    <input type="file" accept=".json" onchange="importJSON(event)">
-    <input id="filter" placeholder="🔍 Cari data..." onkeyup="render()">
-  </div>
+  <button onclick="addRow()">+ Tambah Baris</button>
+  <button onclick="exportJSON()">Export JSON</button>
+  <input type="file" id="fileInput" onchange="importJSON(event)">
+  <br><br>
+  <input type="text" id="searchInput" placeholder="Cari data..." onkeyup="renderTable()">
 
-  <table>
+  <table id="equipmentTable">
     <thead>
       <tr>
+        <th>Category</th>
         <th>Equipment</th>
         <th>Actual Down Time</th>
         <th>LTR Status</th>
@@ -37,115 +58,114 @@
         <th>Aksi</th>
       </tr>
     </thead>
-    <tbody id="tbody"></tbody>
+    <tbody id="tableBody"></tbody>
   </table>
 
   <script>
-    let rows = [];
+    let data = [];
 
-    function render() {
-      const tbody = document.getElementById("tbody");
-      tbody.innerHTML = "";
-      const q = document.getElementById("filter").value.toLowerCase();
-
-      rows.filter(r => 
-        Object.values(r).some(v => String(v).toLowerCase().includes(q))
-      ).forEach((row,i)=>{
-        const tr = document.createElement("tr");
-        if(row.editing){
-          tr.innerHTML = `
-            <td><input value="${row.equipment||""}" id="eq_${i}"></td>
-            <td><input type="datetime-local" value="${row.downTime||""}" id="dt_${i}"></td>
-            <td><input value="${row.status||""}" id="st_${i}"></td>
-            <td><input value="${row.component||""}" id="cp_${i}"></td>
-            <td><input value="${row.plan||""}" id="pl_${i}"></td>
-            <td><input value="${row.location||""}" id="lc_${i}"></td>
-            <td><input type="number" value="${row.aging||""}" id="ag_${i}"></td>
-            <td><input type="date" value="${row.rfu||""}" id="rf_${i}"></td>
-            <td class="actions">
-              <button onclick="saveRow(${i})">Save</button>
-              <button onclick="cancelEdit(${i})">Cancel</button>
-            </td>
-          `;
-        } else {
-          tr.innerHTML = `
-            <td>${row.equipment||""}</td>
-            <td>${row.downTime||""}</td>
-            <td>${row.status||""}</td>
-            <td>${row.component||""}</td>
-            <td>${row.plan||""}</td>
-            <td>${row.location||""}</td>
-            <td>${row.aging||""}</td>
-            <td>${row.rfu||""}</td>
-            <td class="actions">
-              <button onclick="editRow(${i})">Edit</button>
-              <button onclick="deleteRow(${i})">Delete</button>
-            </td>
-          `;
-        }
-        tbody.appendChild(tr);
+    function addRow(item = {}) {
+      data.push({
+        category: item.category || "OHT",
+        equipment: item.equipment || "",
+        downTime: item.downTime || "",
+        status: item.status || "",
+        component: item.component || "",
+        plan: item.plan || "",
+        location: item.location || "",
+        rfu: item.rfu || ""
       });
+      renderTable();
     }
 
-    function addRow(){
-      rows.push({editing:true});
-      render();
-    }
+    function renderTable() {
+      const tbody = document.getElementById("tableBody");
+      tbody.innerHTML = "";
 
-    function editRow(i){
-      rows[i].editing = true;
-      render();
-    }
+      const search = document.getElementById("searchInput").value.toLowerCase();
 
-    function saveRow(i){
-      rows[i] = {
-        equipment: document.getElementById("eq_"+i).value,
-        downTime: document.getElementById("dt_"+i).value,
-        status: document.getElementById("st_"+i).value,
-        component: document.getElementById("cp_"+i).value,
-        plan: document.getElementById("pl_"+i).value,
-        location: document.getElementById("lc_"+i).value,
-        aging: document.getElementById("ag_"+i).value,
-        rfu: document.getElementById("rf_"+i).value,
-        editing:false
-      };
-      render();
-    }
+      // Group by category
+      const grouped = {};
+      data.forEach((row, index) => {
+        if (Object.values(row).join(" ").toLowerCase().includes(search)) {
+          if (!grouped[row.category]) grouped[row.category] = [];
+          grouped[row.category].push({...row, index});
+        }
+      });
 
-    function cancelEdit(i){
-      rows[i].editing = false;
-      render();
-    }
+      for (const category in grouped) {
+        const catRow = document.createElement("tr");
+        catRow.className = "category-row";
+        const td = document.createElement("td");
+        td.colSpan = 10;
+        td.textContent = category;
+        catRow.appendChild(td);
+        tbody.appendChild(catRow);
 
-    function deleteRow(i){
-      if(confirm("Hapus baris ini?")){
-        rows.splice(i,1);
-        render();
+        grouped[category].forEach(row => {
+          const tr = document.createElement("tr");
+
+          // Kolom category (editable dropdown)
+          tr.innerHTML = `
+            <td><input type="text" value="${row.category}" onchange="updateField(${row.index}, 'category', this.value)"></td>
+            <td class="equipment"><input type="text" value="${row.equipment}" onchange="updateField(${row.index}, 'equipment', this.value)"></td>
+            <td><input type="datetime-local" value="${row.downTime}" onchange="updateField(${row.index}, 'downTime', this.value)"></td>
+            <td><input type="text" value="${row.status}" onchange="updateField(${row.index}, 'status', this.value)"></td>
+            <td class="component"><input type="text" value="${row.component}" onchange="updateField(${row.index}, 'component', this.value)"></td>
+            <td class="plan"><input type="text" value="${row.plan}" onchange="updateField(${row.index}, 'plan', this.value)"></td>
+            <td class="location"><input type="text" value="${row.location}" onchange="updateField(${row.index}, 'location', this.value)"></td>
+            <td class="aging">${calcAging(row.downTime, row.rfu)}</td>
+            <td class="rfu"><input type="date" value="${row.rfu}" onchange="updateField(${row.index}, 'rfu', this.value)"></td>
+            <td class="aksi">
+              <button onclick="deleteRow(${row.index})">Delete</button>
+            </td>
+          `;
+          tbody.appendChild(tr);
+        });
       }
     }
 
-    function exportJSON(){
-      const blob = new Blob([JSON.stringify(rows,null,2)],{type:"application/json"});
+    function updateField(index, field, value) {
+      data[index][field] = value;
+      renderTable();
+    }
+
+    function deleteRow(index) {
+      data.splice(index, 1);
+      renderTable();
+    }
+
+    function calcAging(downTime, rfu) {
+      if (!downTime || !rfu) return "";
+      const d1 = new Date(downTime);
+      const d2 = new Date(rfu);
+      const diff = Math.floor((d2 - d1) / (1000*60*60*24));
+      return diff >= 0 ? diff : "";
+    }
+
+    function exportJSON() {
+      const blob = new Blob([JSON.stringify(data, null, 2)], {type: "application/json"});
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
       a.download = "equipment.json";
       a.click();
-      URL.revokeObjectURL(url);
     }
 
-    function importJSON(event){
+    function importJSON(event) {
       const file = event.target.files[0];
-      if(!file) return;
+      if (!file) return;
       const reader = new FileReader();
-      reader.onload = e=>{
-        rows = JSON.parse(e.target.result).map(r=>({...r,editing:false}));
-        render();
-      }
+      reader.onload = e => {
+        data = JSON.parse(e.target.result);
+        renderTable();
+      };
       reader.readAsText(file);
     }
 
-    render();
+    // Contoh awal
+    addRow({category:"OHT", equipment:"CO4210", downTime:"2025-08-15T21:17", status:"On Going LTR Aug", component:"7527 - 2000 HOUR", plan:"PM2000 HRS - SMU 46000", location:"Sitarum", rfu:"2025-08-28"});
+    addRow({category:"Loading", equipment:"CE7136", downTime:"2025-08-13T14:42", status:"On Going LTR Aug", component:"4180 - TRACK ROLLER", plan:"Replace Track Roller", location:"Sitarum", rfu:"2025-08-20"});
   </script>
 </body>
 </html>
