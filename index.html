@@ -1,204 +1,176 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <title>Monitoring Equipment</title>
-  <style>
-    body { font-family: Arial, sans-serif; padding: 20px; }
-    h2 { margin-bottom: 10px; }
-    table { border-collapse: collapse; width: 100%; margin-top: 10px; }
-    th, td {
-      border: 1px solid #000;
-      padding: 6px;
-      text-align: left;
-    }
-    th { background: #eee; }
-    .category-row {
-      background: #ffd966;
-      font-weight: bold;
-    }
-    .aksi button { margin-right: 4px; }
-    td { vertical-align: middle; }
-    /* Lebar kolom */
-    td.equipment { width: 80px; }
-    td.down { width: 120px; }
-    td.status { width: 120px; }
-    td.component { width: 220px; }
-    td.plan { width: 300px; }
-    td.location { width: 120px; }
-    td.aging { width: 80px; text-align: center; }
-    td.rfu { width: 120px; }
-    td.aksi { width: 120px; text-align: center; }
-    input[type="text"], input[type="datetime-local"], input[type="date"] {
-      width: 100%; box-sizing: border-box;
-    }
-  </style>
+<meta charset="UTF-8">
+<title>Monitoring Equipment</title>
+<style>
+  body { font-family: Arial, sans-serif; margin: 20px; }
+  h2 { margin-bottom: 10px; }
+  table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+  th, td {
+    border: 1px solid #000;
+    padding: 4px;
+    text-align: left;
+  }
+  th { background: #f2f2f2; }
+  .category-row {
+    background: #ffd966;
+    font-weight: bold;
+  }
+  .btn { margin: 5px; padding: 4px 8px; cursor: pointer; }
+  .small { width: 100px; }
+  .medium { width: 180px; }
+  .large { width: 250px; }
+  .action-btn { margin-right: 5px; cursor: pointer; color: blue; }
+</style>
 </head>
 <body>
-  <h2>Monitoring Equipment</h2>
 
-  <button onclick="exportJSON()">Save JSON</button>
-  <input type="file" id="fileInput" onchange="importJSON(event)">
-  <br><br>
-  <input type="text" id="searchInput" placeholder="Cari data..." onkeyup="renderTable()">
+<h2>Monitoring Equipment</h2>
 
-  <table id="equipmentTable">
-    <thead>
-      <tr>
-        <th>Equipment</th>
-        <th>Actual Down Time</th>
-        <th>LTR Status</th>
-        <th>Component Code</th>
-        <th>Action Plan</th>
-        <th>Location</th>
-        <th>BD Aging Days</th>
-        <th>Est RFU</th>
-        <th>Aksi</th>
-      </tr>
-    </thead>
-    <tbody id="tableBody"></tbody>
-  </table>
+<button id="saveBtn" class="btn">Save JSON</button>
+<input type="file" id="loadFile" class="btn">
 
-  <script>
-    let data = [
-      {category:"Loading", equipment:"CE7136", downTime:"2025-08-13T14:42", status:"On Going LTR Aug", component:"4180 - TRACK ROLLER", plan:"Replace Track Roller", location:"Sitarum", rfu:"2025-08-20"},
-      {category:"OHT", equipment:"CO4210", downTime:"2025-08-15T21:17", status:"On Going LTR Aug", component:"7527 - 2000 HOUR", plan:"PM2000 HRS - SMU 46000", location:"Sitarum", rfu:"2025-08-28"}
-    ];
-    let editIndex = null;
+<input type="text" id="searchBox" placeholder="Cari data..." style="width:100%; margin:10px 0;">
 
-    function renderTable() {
-      const tbody = document.getElementById("tableBody");
-      tbody.innerHTML = "";
-      const search = document.getElementById("searchInput").value.toLowerCase();
+<div id="tableContainer"></div>
 
-      // Group by category
-      const grouped = {};
-      data.forEach((row, i) => {
-        if (Object.values(row).join(" ").toLowerCase().includes(search)) {
-          if (!grouped[row.category]) grouped[row.category] = [];
-          grouped[row.category].push({...row, index:i});
-        }
-      });
+<script>
+const categories = ["Loading", "OHT", "Support", "Plant"]; 
+let data = {
+  "Loading": [],
+  "OHT": [],
+  "Support": [],
+  "Plant": []
+};
 
-      for (const category in grouped) {
-        // Header kategori
-        const catRow = document.createElement("tr");
-        catRow.className = "category-row";
-        const td = document.createElement("td");
-        td.colSpan = 9;
-        td.innerHTML = ${category} <button onclick="addRow('${category}')">+ Tambah</button>;
-        catRow.appendChild(td);
-        tbody.appendChild(catRow);
+// render table
+function renderTable() {
+  const container = document.getElementById("tableContainer");
+  container.innerHTML = "";
 
-        grouped[category].forEach(row => {
-          const tr = document.createElement("tr");
+  categories.forEach(cat => {
+    let html = `
+      <table>
+        <tr class="category-row"><td colspan="9">${cat}</td></tr>
+        <tr>
+          <th class="small">Equipment</th>
+          <th class="small">Actual Down Time</th>
+          <th class="small">LTR Status</th>
+          <th class="large">Component Code</th>
+          <th class="large">Action Plan</th>
+          <th class="medium">Location</th>
+          <th class="small">BD Aging Days</th>
+          <th class="small">Est RFU</th>
+          <th class="small">Aksi</th>
+        </tr>
+    `;
 
-          if (editIndex === row.index) {
-            // Mode edit
-            tr.innerHTML = `
-              <td class="equipment"><input type="text" value="${row.equipment}" onchange="updateField(${row.index}, 'equipment', this.value)"></td>
-              <td class="down"><input type="datetime-local" value="${row.downTime}" onchange="updateField(${row.index}, 'downTime', this.value)"></td>
-              <td class="status"><input type="text" value="${row.status}" onchange="updateField(${row.index}, 'status', this.value)"></td>
-              <td class="component"><input type="text" value="${row.component}" onchange="updateField(${row.index}, 'component', this.value)"></td>
-              <td class="plan"><input type="text" value="${row.plan}" onchange="updateField(${row.index}, 'plan', this.value)"></td>
-              <td class="location"><input type="text" value="${row.location}" onchange="updateField(${row.index}, 'location', this.value)"></td>
-              <td class="aging">${calcAging(row.downTime, row.rfu)}</td>
-              <td class="rfu"><input type="date" value="${row.rfu}" onchange="updateField(${row.index}, 'rfu', this.value)"></td>
-              <td class="aksi">
-                <button onclick="saveRow()">Save</button>
-                <button onclick="cancelEdit()">Cancel</button>
-              </td>
-            `;
-          } else {
-            // Mode view
-            tr.innerHTML = `
-              <td class="equipment">${row.equipment}</td>
-              <td class="down">${formatDate(row.downTime)}</td>
-              <td class="status">${row.status}</td>
-              <td class="component">${row.component}</td>
-              <td class="plan">${row.plan}</td>
-              <td class="location">${row.location}</td>
-              <td class="aging">${calcAging(row.downTime, row.rfu)}</td>
-              <td class="rfu">${formatDate(row.rfu)}</td>
-              <td class="aksi">
-                <button onclick="editRow(${row.index})">Edit</button>
-                <button onclick="deleteRow(${row.index})">Delete</button>
-              </td>
-            `;
-          }
+    data[cat].forEach((row, i) => {
+      html += `
+        <tr>
+          <td>${row.equipment}</td>
+          <td>${row.downTime}</td>
+          <td>${row.ltr}</td>
+          <td>${row.compCode}</td>
+          <td>${row.action}</td>
+          <td>${row.loc}</td>
+          <td>${row.bdAging}</td>
+          <td>${row.rfu}</td>
+          <td>
+            <span class="action-btn" onclick="editRow('${cat}', ${i})">Edit</span>
+            <span class="action-btn" onclick="deleteRow('${cat}', ${i})">Delete</span>
+          </td>
+        </tr>`;
+    });
 
-          tbody.appendChild(tr);
-        });
-      }
-    }
+    html += `
+      <tr><td colspan="9" style="text-align:center;">
+        <button class="btn" onclick="addRow('${cat}')">+ Tambah Baris</button>
+      </td></tr>
+      </table>
+    `;
 
-    function updateField(index, field, value) {
-      data[index][field] = value;
-    }
+    container.innerHTML += html;
+  });
+}
 
-    function addRow(category) {
-      data.push({category, equipment:"", downTime:"", status:"", component:"", plan:"", location:"", rfu:""});
-      editIndex = data.length - 1;
-      renderTable();
-    }
+function addRow(cat) {
+  data[cat].push({
+    equipment: "", downTime: "", ltr: "", compCode: "",
+    action: "", loc: "", bdAging: "", rfu: ""
+  });
+  editRow(cat, data[cat].length - 1);
+}
 
-    function editRow(index) {
-      editIndex = index;
-      renderTable();
-    }
+function editRow(cat, idx) {
+  const row = data[cat][idx];
+  const table = document.getElementById("tableContainer");
+  const rows = table.getElementsByTagName("table")[categories.indexOf(cat)].rows;
+  const tr = rows[idx+2]; // offset (header + category row)
+  tr.innerHTML = `
+    <td><input value="${row.equipment}"></td>
+    <td><input type="date" value="${row.downTime}"></td>
+    <td><input value="${row.ltr}"></td>
+    <td><input value="${row.compCode}"></td>
+    <td><input value="${row.action}"></td>
+    <td><input value="${row.loc}"></td>
+    <td>${row.bdAging}</td>
+    <td><input type="date" value="${row.rfu}"></td>
+    <td>
+      <span class="action-btn" onclick="saveRow('${cat}', ${idx}, this)">Save</span>
+      <span class="action-btn" onclick="renderTable()">Cancel</span>
+    </td>
+  `;
+}
 
-    function saveRow() {
-      editIndex = null;
-      renderTable();
-    }
+function saveRow(cat, idx, el) {
+  const inputs = el.closest("tr").querySelectorAll("input");
+  const down = inputs[1].value, rfu = inputs[7].value;
+  const bdAging = (down && rfu) ? 
+    Math.ceil((new Date(rfu) - new Date(down)) / (1000*60*60*24)) : "";
 
-    function cancelEdit() {
-      editIndex = null;
-      renderTable();
-    }
+  data[cat][idx] = {
+    equipment: inputs[0].value,
+    downTime: down,
+    ltr: inputs[2].value,
+    compCode: inputs[3].value,
+    action: inputs[4].value,
+    loc: inputs[5].value,
+    bdAging: bdAging,
+    rfu: rfu
+  };
+  renderTable();
+}
 
-    function deleteRow(index) {
-      data.splice(index,1);
-      renderTable();
-    }
+function deleteRow(cat, idx) {
+  data[cat].splice(idx, 1);
+  renderTable();
+}
 
-    function calcAging(downTime, rfu) {
-      if (!downTime || !rfu) return "";
-      const d1 = new Date(downTime);
-      const d2 = new Date(rfu);
-      const diff = Math.floor((d2 - d1) / (1000*60*60*24));
-      return diff >= 0 ? diff : "";
-    }
+// save JSON
+document.getElementById("saveBtn").addEventListener("click", () => {
+  const blob = new Blob([JSON.stringify(data)], {type: "application/json"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "monitoring.json";
+  a.click();
+});
 
-    function formatDate(dateStr) {
-      if (!dateStr) return "";
-      const d = new Date(dateStr);
-      if (isNaN(d)) return "";
-      const options = {day:"2-digit", month:"short", year:"numeric"};
-      return d.toLocaleDateString("en-GB", options).replace(/ /g, "-");
-    }
-
-    function exportJSON() {
-      const blob = new Blob([JSON.stringify(data, null, 2)], {type: "application/json"});
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "equipment.json";
-      a.click();
-    }
-
-    function importJSON(event) {
-      const file = event.target.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = e => {
-        data = JSON.parse(e.target.result);
-        renderTable();
-      };
-      reader.readAsText(file);
-    }
-
+// load JSON
+document.getElementById("loadFile").addEventListener("change", function(e){
+  const file = e.target.files[0];
+  const reader = new FileReader();
+  reader.onload = () => {
+    data = JSON.parse(reader.result);
     renderTable();
-  </script>
+  };
+  reader.readAsText(file);
+});
+
+// pertama kali
+renderTable();
+</script>
+
 </body>
 </html>
