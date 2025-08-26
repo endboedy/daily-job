@@ -1,49 +1,151 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Daily Job</title>
-  <link rel="stylesheet" href="daily_job.css" />
-  <script defer src="daily_job.js"></script>
+  <meta charset="UTF-8">
+  <title>Monitoring Equipment</title>
+  <style>
+    body{font-family:Arial, sans-serif; margin:20px;}
+    table{width:100%; border-collapse:collapse; margin-top:10px;}
+    th,td{border:1px solid #aaa; padding:6px; font-size:14px;}
+    th{background:#f0f0f0;}
+    .actions button{margin:2px;}
+    .toolbar{margin-bottom:10px;}
+    input,select{width:100%; box-sizing:border-box;}
+  </style>
 </head>
 <body>
-  <h1>Daily Job</h1>
+  <h2>📊 Monitoring Equipment</h2>
 
-  <div class="filter-container">
-    <label for="filterEquip">Filter Equipment:</label>
-    <select id="filterEquip">
-      <option value="">All</option>
-    </select>
+  <div class="toolbar">
+    <button onclick="addRow()">➕ Tambah Baris</button>
+    <button onclick="exportJSON()">💾 Export JSON</button>
+    <input type="file" accept=".json" onchange="importJSON(event)">
+    <input id="filter" placeholder="🔍 Cari data..." onkeyup="render()">
   </div>
 
-  <table id="jobTable">
+  <table>
     <thead>
       <tr>
-        <th>X</th>
-        <th>Equip</th>
-        <th>Description</th>
-        <th>Work Order</th>
-        <th>Status</th>
-        <th>Remarks</th>
-        <th>Status Job</th>
-        <th>Action</th>
+        <th>Equipment</th>
+        <th>Actual Down Time</th>
+        <th>LTR Status</th>
+        <th>Component Code</th>
+        <th>Action Plan</th>
+        <th>Location</th>
+        <th>BD Aging Days</th>
+        <th>Est RFU</th>
+        <th>Aksi</th>
       </tr>
     </thead>
-    <tbody></tbody>
+    <tbody id="tbody"></tbody>
   </table>
 
-  <button id="toggleForm">Add New Job</button>
+  <script>
+    let rows = [];
 
-  <div id="formContainer" class="hidden">
-    <form id="addForm">
-      <input type="text" id="equip" placeholder="Equip" required />
-      <input type="text" id="description" placeholder="Description" required />
-      <input type="text" id="workOrder" placeholder="Work Order" required />
-      <input type="text" id="status" placeholder="Status" />
-      <input type="text" id="remarks" placeholder="Remarks" />
-      <button type="submit">Add</button>
-    </form>
-  </div>
+    function render() {
+      const tbody = document.getElementById("tbody");
+      tbody.innerHTML = "";
+      const q = document.getElementById("filter").value.toLowerCase();
+
+      rows.filter(r => 
+        Object.values(r).some(v => String(v).toLowerCase().includes(q))
+      ).forEach((row,i)=>{
+        const tr = document.createElement("tr");
+        if(row.editing){
+          tr.innerHTML = `
+            <td><input value="${row.equipment||""}" id="eq_${i}"></td>
+            <td><input type="datetime-local" value="${row.downTime||""}" id="dt_${i}"></td>
+            <td><input value="${row.status||""}" id="st_${i}"></td>
+            <td><input value="${row.component||""}" id="cp_${i}"></td>
+            <td><input value="${row.plan||""}" id="pl_${i}"></td>
+            <td><input value="${row.location||""}" id="lc_${i}"></td>
+            <td><input type="number" value="${row.aging||""}" id="ag_${i}"></td>
+            <td><input type="date" value="${row.rfu||""}" id="rf_${i}"></td>
+            <td class="actions">
+              <button onclick="saveRow(${i})">Save</button>
+              <button onclick="cancelEdit(${i})">Cancel</button>
+            </td>
+          `;
+        } else {
+          tr.innerHTML = `
+            <td>${row.equipment||""}</td>
+            <td>${row.downTime||""}</td>
+            <td>${row.status||""}</td>
+            <td>${row.component||""}</td>
+            <td>${row.plan||""}</td>
+            <td>${row.location||""}</td>
+            <td>${row.aging||""}</td>
+            <td>${row.rfu||""}</td>
+            <td class="actions">
+              <button onclick="editRow(${i})">Edit</button>
+              <button onclick="deleteRow(${i})">Delete</button>
+            </td>
+          `;
+        }
+        tbody.appendChild(tr);
+      });
+    }
+
+    function addRow(){
+      rows.push({editing:true});
+      render();
+    }
+
+    function editRow(i){
+      rows[i].editing = true;
+      render();
+    }
+
+    function saveRow(i){
+      rows[i] = {
+        equipment: document.getElementById("eq_"+i).value,
+        downTime: document.getElementById("dt_"+i).value,
+        status: document.getElementById("st_"+i).value,
+        component: document.getElementById("cp_"+i).value,
+        plan: document.getElementById("pl_"+i).value,
+        location: document.getElementById("lc_"+i).value,
+        aging: document.getElementById("ag_"+i).value,
+        rfu: document.getElementById("rf_"+i).value,
+        editing:false
+      };
+      render();
+    }
+
+    function cancelEdit(i){
+      rows[i].editing = false;
+      render();
+    }
+
+    function deleteRow(i){
+      if(confirm("Hapus baris ini?")){
+        rows.splice(i,1);
+        render();
+      }
+    }
+
+    function exportJSON(){
+      const blob = new Blob([JSON.stringify(rows,null,2)],{type:"application/json"});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "equipment.json";
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function importJSON(event){
+      const file = event.target.files[0];
+      if(!file) return;
+      const reader = new FileReader();
+      reader.onload = e=>{
+        rows = JSON.parse(e.target.result).map(r=>({...r,editing:false}));
+        render();
+      }
+      reader.readAsText(file);
+    }
+
+    render();
+  </script>
 </body>
 </html>
