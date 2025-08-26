@@ -1,48 +1,37 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8">
-<title>Monitoring Equipment</title>
-<style>
-  body { font-family: Arial, sans-serif; margin: 20px; }
-  h2 { margin-bottom: 10px; }
-  table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
-  th, td {
-    border: 1px solid #000;
-    padding: 4px;
-    text-align: left;
-  }
-  th { background: #f2f2f2; }
-  .category-row {
-    background: #ffd966;
-    font-weight: bold;
-  }
-  .btn { margin: 5px; padding: 4px 8px; cursor: pointer; }
-  .small { width: 100px; }
-  .medium { width: 180px; }
-  .large { width: 250px; }
-  .action-btn { margin-right: 5px; cursor: pointer; color: blue; }
-</style>
+  <meta charset="UTF-8">
+  <title>Monitoring Equipment</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    h2 { margin-bottom: 10px; }
+    table { border-collapse: collapse; margin-bottom: 30px; width: 100%; }
+    th, td { border: 1px solid #999; padding: 6px; text-align: center; }
+    th.small { width: 100px; }
+    th.medium { width: 150px; }
+    th.large { width: 200px; }
+    .category-row { background: #eee; font-weight: bold; text-align: left; }
+    .btn { padding: 4px 10px; margin: 2px; cursor: pointer; background: #007bff; color: white; border: none; border-radius: 3px; }
+    .btn:hover { background: #0056b3; }
+    .action-btn { margin: 0 4px; cursor: pointer; color: blue; text-decoration: underline; }
+    input { width: 95%; padding: 3px; }
+  </style>
 </head>
 <body>
+  <h2>Monitoring Equipment</h2>
 
-<h2>Monitoring Equipment</h2>
+  <button id="saveBtn" class="btn">Save JSON</button>
+  <input type="file" id="loadFile">
 
-<button id="saveBtn" class="btn">Save JSON</button>
-<input type="file" id="loadFile" class="btn">
-
-<input type="text" id="searchBox" placeholder="Cari data..." style="width:100%; margin:10px 0;">
-
-<div id="tableContainer"></div>
+  <div id="tableContainer"></div>
 
 <script>
 const categories = ["Loading", "Hauling", "Auxiliary", "Coal Getting", "Dozing", "Grading", "Water Truck"]; 
-let data = {
-  "Loading": [],
-  "OHT": [],
-  "Support": [],
-  "Plant": []
-};
+
+// inisialisasi data kosong berdasarkan kategori
+let data = {};
+categories.forEach(cat => data[cat] = []);
 
 // render table
 function renderTable() {
@@ -106,8 +95,9 @@ function addRow(cat) {
 function editRow(cat, idx) {
   const row = data[cat][idx];
   const table = document.getElementById("tableContainer");
-  const rows = table.getElementsByTagName("table")[categories.indexOf(cat)].rows;
-  const tr = rows[idx+2]; // offset (header + category row)
+  const tables = table.getElementsByTagName("table");
+  const rows = tables[categories.indexOf(cat)].rows;
+  const tr = rows[idx+2]; // offset header
   tr.innerHTML = `
     <td><input value="${row.equipment}"></td>
     <td><input type="date" value="${row.downTime}"></td>
@@ -163,14 +153,15 @@ document.getElementById("loadFile").addEventListener("change", function(e){
   const reader = new FileReader();
   reader.onload = () => {
     data = JSON.parse(reader.result);
+    // pastikan kategori dari file masih ada
+    categories.forEach(cat => { if(!data[cat]) data[cat] = []; });
     renderTable();
   };
   reader.readAsText(file);
 });
 
-// pertama kali
+// pertama kali render
 renderTable();
 </script>
-
 </body>
 </html>
