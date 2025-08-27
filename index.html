@@ -5,52 +5,131 @@
   <meta charset="UTF-8">
   <title>Monitoring Equipment</title>
   <style>
-    body { font-family: Arial, sans-serif; margin: 20px; font-size: 12px; }
-    h2 { margin-bottom: 10px; }
-    table { border-collapse: collapse; margin-bottom: 30px; width: 100%; font-weight: normal; }
-    th { border: 1px solid #999; padding: 4px; font-size: 12px; text-align: center; background: #e0e0e0; }
-    td { border: 1px solid #999; padding: 4px; font-size: 12px; }
-    .small { width: 80px; }
-    .medium { width: 120px; }
-    .large { width: 250px; }
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      font-size: 12px;
+    }
+
+    h2 {
+      margin-bottom: 10px;
+    }
+
+    table {
+      border-collapse: collapse;
+      margin-bottom: 30px;
+      width: 100%;
+      font-weight: normal;
+    }
+
+    th {
+      border: 1px solid #999;
+      padding: 4px;
+      font-size: 12px;
+      text-align: center;
+      background: #e0e0e0;
+    }
+
+    td {
+      border: 1px solid #999;
+      padding: 4px;
+      font-size: 12px;
+    }
+
+    .small { width: 60px; }
+    .medium { width: 90px; }
+    .large { width: 150px; }
+
     .text-left { text-align: left; }
     .text-right { text-align: right; }
     .text-center { text-align: center; }
-    .category-row { background: #ffeb99; text-align: left; font-weight: bold; }
-    .btn { padding: 3px 8px; margin: 2px; cursor: pointer; background: #007bff; color: white; border: none; border-radius: 3px; font-size: 11px; }
+
+    .category-row {
+      background: #ffeb99;
+      text-align: left;
+      font-weight: bold;
+    }
+
+    .btn {
+      padding: 3px 8px;
+      margin: 2px;
+      cursor: pointer;
+      background: #007bff;
+      color: white;
+      border: none;
+      border-radius: 3px;
+      font-size: 11px;
+    }
+
     .btn:hover { background: #0056b3; }
-    .action-btn { margin: 0 3px; cursor: pointer; color: blue; text-decoration: underline; font-size: 11px; }
-    input { width: 95%; padding: 2px; font-size: 12px; }
-    .top-bar { display: flex; justify-content: flex-end; align-items: center; margin-bottom: 10px; gap: 6px; }
-    #loadFile { display: none; }
-    .custom-file-label { padding: 3px 8px; background: #6c757d; color: white; border-radius: 3px; font-size: 12px; cursor: pointer; }
-    .custom-file-label:hover { background: #5a6268; }
 
-   
-@media print {
-  body {
-    font-size: 8px;
-    margin: 10px;
-  }
+    .action-btn {
+      margin: 0 3px;
+      cursor: pointer;
+      color: blue;
+      text-decoration: underline;
+      font-size: 11px;
+    }
 
-  .top-bar, .btn, .action-btn, input {
-    display: none !important;
-  }
+    input {
+      width: 95%;
+      padding: 2px;
+      font-size: 12px;
+    }
 
-  table {
-    font-size: 8px;
-    width: 75%;
-  }
+    .top-bar {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      margin-bottom: 10px;
+      gap: 6px;
+    }
 
-  th, td {
-    padding: 2px;
-  }
+    #loadFile {
+      display: none;
+    }
 
-  .small { width: 50px; }
-  .medium { width: 70px; }
-  .large { width: 1000px; }
-}
+    .custom-file-label {
+      padding: 3px 8px;
+      background: #6c757d;
+      color: white;
+      border-radius: 3px;
+      font-size: 12px;
+      cursor: pointer;
+    }
 
+    .custom-file-label:hover {
+      background: #5a6268;
+    }
+
+    @page {
+      size: 210mm 330mm landscape;
+      margin: 10mm;
+    }
+
+    @media print {
+      body {
+        font-size: 9px;
+        margin: 10px;
+      }
+
+      .top-bar, .btn, .action-btn, input {
+        display: none !important;
+      }
+
+      table {
+        font-size: 9px;
+        width: 100%;
+      }
+
+      th, td {
+        padding: 2px;
+      }
+
+      .small { width: 60px; }
+      .medium { width: 90px; }
+      .large { width: 150px; }
+    }
   </style>
 </head>
 <body>
@@ -67,7 +146,7 @@
   <div id="tableContainer"></div>
 
 <script>
-const categories = ["Loading", "Hauling", "Auxiliary", "Coal Getting", "Dozing", "Grading", "Water Truck"]; 
+const categories = ["Loading", "Hauling", "Auxiliary", "Coal Getting", "Dozing", "Grading", "Water Truck"];
 let data = {};
 categories.forEach(cat => data[cat] = []);
 
