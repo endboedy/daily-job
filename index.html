@@ -4,208 +4,85 @@
 <meta charset="UTF-8">
 <title>Monitoring Equipment</title>
 <style>
-  body { 
-    font-family: Arial, sans-serif; 
-    margin: 20px; 
-    font-size: 12px; 
-  }
-
-  h2 { 
-    margin-bottom: 10px; 
-  }
-
-  table { 
-    border-collapse: collapse; 
-    margin-bottom: 30px; 
-    width: 100%; 
-    font-weight: normal; 
-  }
-
-  th { 
-    border: 1px solid #999; 
-    padding: 4px; 
-    font-size: 12px; 
-    text-align: center; 
-    background: #e0e0e0;  /* abu-abu untuk header */
-  }
-
-  td { 
-    border: 1px solid #999; 
-    padding: 4px; 
-    font-size: 12px; 
-  }
-
-  /* ukuran kolom */
-  .small { width: 80px; }
-  .medium { width: 120px; }
-  .large { width: 250px; }
-
-  /* align */
-  .text-left { text-align: left; }
-  .text-right { text-align: right; }
-  .text-center { text-align: center; }
-
-  /* kategori */
-  .category-row {
-    background: #ffeb99; 
-    text-align: left; 
-    font-weight: bold;
-  }
-
-  .btn { 
-    padding: 3px 8px; 
-    margin: 2px; 
-    cursor: pointer; 
-    background: #007bff; 
-    color: white; 
-    border: none; 
-    border-radius: 3px; 
-    font-size: 11px; 
-  }
-
+  body { font-family: Arial, sans-serif; margin: 20px; font-size: 12px; }
+  h2 { margin-bottom: 10px; }
+  table { border-collapse: collapse; margin-bottom: 30px; width: 100%; }
+  th, td { border: 1px solid #999; padding: 4px; font-size: 12px; }
+  th { text-align: center; background: #e0e0e0; }
+  .category-row { background: #ffeb99; font-weight: bold; }
+  .btn { padding: 4px 8px; margin: 2px; cursor: pointer; background: #007bff; color: #fff; border: none; border-radius: 3px; font-size: 11px; }
   .btn:hover { background: #0056b3; }
-
-  .action-btn { 
-    margin: 0 3px; 
-    cursor: pointer; 
-    color: blue; 
-    text-decoration: underline; 
-    font-size: 11px; 
-  }
-
-  input { 
-    width: 95%; 
-    padding: 2px; 
-    font-size: 12px; 
-  }
-
-  /* top bar kanan */
-  .top-bar {
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    margin-bottom: 10px;
-    gap: 6px;
-  }
-
-  /* sembunyikan input file asli */
-  #loadFile {
-    display: none;
-  }
-
-  .custom-file-label {
-    padding: 3px 8px;
-    background: #6c757d;
-    color: white;
-    border-radius: 3px;
-    font-size: 12px;
-    cursor: pointer;
-  }
-
-  .custom-file-label:hover {
-    background: #5a6268;
-  }
+  .action-btn { margin: 0 3px; cursor: pointer; color: blue; text-decoration: underline; font-size: 11px; }
+  input { width: 95%; font-size: 12px; }
+  .top-bar { display: flex; justify-content: flex-end; gap: 6px; margin-bottom: 10px; }
+  #loadFile { display: none; }
+  .custom-file-label { padding: 3px 8px; background: #6c757d; color: #fff; border-radius: 3px; font-size: 12px; cursor: pointer; }
+  .custom-file-label:hover { background: #5a6268; }
 </style>
 </head>
 <body>
-
   <h2>Monitoring Equipment</h2>
-
   <div class="top-bar">
     <button id="pdfBtn" class="btn">Download PDF</button>
     <button id="saveBtn" class="btn">Save JSON</button>
     <label for="loadFile" class="custom-file-label">Choose File</label>
     <input type="file" id="loadFile" accept=".json">
   </div>
-
   <div id="tableContainer"></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
 
 <script>
-const categories = ["Loading", "Hauling", "Auxiliary", "Coal Getting", "Dozing", "Grading", "Water Truck"]; 
-
+const categories = ["Loading","Hauling","Auxiliary","Coal Getting","Dozing","Grading","Water Truck"]; 
 let data = {};
 categories.forEach(cat => data[cat] = []);
 
 function renderTable() {
   const container = document.getElementById("tableContainer");
   container.innerHTML = "";
-
   categories.forEach(cat => {
-    // urutkan dari aging terbesar ke kecil
-    data[cat].sort((a,b) => (b.bdAging || 0) - (a.bdAging || 0));
-
+    data[cat].sort((a,b) => (b.bdAging||0) - (a.bdAging||0));
     let html = `
       <table>
         <tr class="category-row"><td colspan="9">${cat}</td></tr>
         <tr>
-          <th class="small text-left">Equipment</th>
-          <th class="small text-right">Actual Down Time</th>
-          <th class="small text-left">LTR Status</th>
-          <th class="large text-left">Action Plan</th>
-          <th class="medium text-left">Component Code</th>
-          <th class="medium text-left">Location</th>
-          <th class="small text-center">BD Aging Days</th>
-          <th class="small text-right">Est RFU</th>
-          <th class="small text-center">Action</th>
-        </tr>
-    `;
-
-    data[cat].forEach((row, i) => {
-      html += `
-        <tr>
-          <td class="text-left">${row.equipment}</td>
-          <td class="text-right">${row.downTime}</td>
-          <td class="text-left">${row.ltr}</td>
-          <td class="text-left">${row.action}</td>
-          <td class="text-left">${row.compCode}</td>
-          <td class="text-left">${row.loc}</td>
-          <td class="text-center">${row.bdAging}</td>
-          <td class="text-right">${row.rfu}</td>
-          <td class="text-center">
-            <span class="action-btn" onclick="editRow('${cat}', ${i})">Edit</span>
-            <span class="action-btn" onclick="deleteRow('${cat}', ${i})">Delete</span>
-          </td>
+          <th>Equipment</th><th>Actual Down Time</th><th>LTR Status</th>
+          <th>Action Plan</th><th>Component Code</th><th>Location</th>
+          <th>BD Aging Days</th><th>Est RFU</th><th>Action</th>
         </tr>`;
+    data[cat].forEach((row,i) => {
+      html += `<tr>
+        <td>${row.equipment}</td><td>${row.downTime}</td><td>${row.ltr}</td>
+        <td>${row.action}</td><td>${row.compCode}</td><td>${row.loc}</td>
+        <td>${row.bdAging}</td><td>${row.rfu}</td>
+        <td>
+          <span class="action-btn" onclick="editRow('${cat}',${i})">Edit</span>
+          <span class="action-btn" onclick="deleteRow('${cat}',${i})">Delete</span>
+        </td>
+      </tr>`;
     });
-
-    html += `
-      <tr>
-        <td colspan="8"></td>
-        <td class="text-center"><button class="btn" onclick="addRow('${cat}')">+ Add</button></td>
-      </tr>
-      </table>
-    `;
-
+    html += <tr><td colspan="8"></td><td><button class="btn" onclick="addRow('${cat}')">+ Add</button></td></tr></table>;
     container.innerHTML += html;
   });
 }
 
-function calcAging(down) {
-  if (!down) return "";
-  const today = new Date();
-  const dt = new Date(down);
-  return Math.ceil((today - dt) / (1000*60*60*24));
+function calcAging(down){
+  if(!down) return "";
+  const today=new Date(), dt=new Date(down);
+  return Math.ceil((today-dt)/(1000*60*60*24));
 }
 
-function addRow(cat) {
-  data[cat].push({
-    equipment: "", downTime: "", ltr: "", compCode: "",
-    action: "", loc: "", bdAging: "", rfu: ""
-  });
-  editRow(cat, data[cat].length - 1);
+function addRow(cat){
+  data[cat].push({equipment:"",downTime:"",ltr:"",action:"",compCode:"",loc:"",bdAging:"",rfu:""});
+  editRow(cat,data[cat].length-1);
 }
 
-function editRow(cat, idx) {
-  const row = data[cat][idx];
-  const table = document.getElementById("tableContainer");
-  const tables = table.getElementsByTagName("table");
-  const rows = tables[categories.indexOf(cat)].rows;
-  const tr = rows[idx+2]; // header offset
-  tr.innerHTML = `
-    <td><input value="${row.equipment}"></td>
+function editRow(cat,idx){
+  const row=data[cat][idx];
+  const table=document.getElementById("tableContainer").getElementsByTagName("table")[categories.indexOf(cat)];
+  const tr=table.rows[idx+2];
+  tr.innerHTML=`<td><input value="${row.equipment}"></td>
     <td><input type="date" value="${row.downTime}"></td>
     <td><input value="${row.ltr}"></td>
     <td><input value="${row.action}"></td>
@@ -213,83 +90,53 @@ function editRow(cat, idx) {
     <td><input value="${row.loc}"></td>
     <td>${row.bdAging}</td>
     <td><input type="date" value="${row.rfu}"></td>
-    <td class="text-center">
-      <span class="action-btn" onclick="saveRow('${cat}', ${idx}, this)">Save</span>
+    <td>
+      <span class="action-btn" onclick="saveRow('${cat}',${idx},this)">Save</span>
       <span class="action-btn" onclick="renderTable()">Cancel</span>
-    </td>
-  `;
+    </td>`;
 }
 
-function saveRow(cat, idx, el) {
-  const inputs = el.closest("tr").querySelectorAll("input");
-  const down = inputs[1].value;
-  const rfu = inputs[6].value;
-  const bdAging = down ? calcAging(down) : "";
-
-  data[cat][idx] = {
-    equipment: inputs[0].value,
-    downTime: down,
-    ltr: inputs[2].value,
-    action: inputs[3].value,
-    compCode: inputs[4].value,
-    loc: inputs[5].value,
-    bdAging: bdAging,
-    rfu: rfu
+function saveRow(cat,idx,el){
+  const inputs=el.closest("tr").querySelectorAll("input");
+  const down=inputs[1].value;
+  data[cat][idx]={
+    equipment:inputs[0].value,
+    downTime:down,
+    ltr:inputs[2].value,
+    action:inputs[3].value,
+    compCode:inputs[4].value,
+    loc:inputs[5].value,
+    bdAging:down?calcAging(down):"",
+    rfu:inputs[6].value
   };
   renderTable();
 }
 
-function deleteRow(cat, idx) {
-  data[cat].splice(idx, 1);
-  renderTable();
-}
+function deleteRow(cat,idx){ data[cat].splice(idx,1); renderTable(); }
 
-document.getElementById("saveBtn").addEventListener("click", () => {
-  const blob = new Blob([JSON.stringify(data)], {type: "application/json"});
-  const a = document.createElement("a");
-  a.href = URL.createObjectURL(blob);
-  a.download = "monitoring.json";
-  a.click();
-});
+document.getElementById("saveBtn").onclick=()=>{
+  const blob=new Blob([JSON.stringify(data)],{type:"application/json"});
+  const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="monitoring.json"; a.click();
+};
 
-document.getElementById("loadFile").addEventListener("change", function(e){
-  const file = e.target.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = () => {
-    data = JSON.parse(reader.result);
-    categories.forEach(cat => { if(!data[cat]) data[cat] = []; });
-    renderTable();
-  };
+document.getElementById("loadFile").onchange=e=>{
+  const file=e.target.files[0]; if(!file) return;
+  const reader=new FileReader();
+  reader.onload=()=>{ data=JSON.parse(reader.result); categories.forEach(cat=>{if(!data[cat]) data[cat]=[]}); renderTable(); };
   reader.readAsText(file);
-});
+};
 
-// === DOWNLOAD PDF ===
-document.getElementById("pdfBtn").addEventListener("click", () => {
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF();
-
-  categories.forEach((cat, idx) => {
-    if (idx > 0) doc.addPage();
-
+document.getElementById("pdfBtn").onclick=()=>{
+  const {jsPDF}=window.jspdf; const doc=new jsPDF();
+  categories.forEach((cat,idx)=>{
+    if(idx>0) doc.addPage();
     doc.setFontSize(14);
-    doc.text(Category: ${cat}, 20, 15);
-
-    const rows = data[cat].map(r => [
-      r.equipment, r.downTime, r.ltr, r.action,
-      r.compCode, r.loc, r.bdAging, r.rfu
-    ]);
-
-    doc.autoTable({
-      head: [["Equipment","Actual Down Time","LTR Status","Action Plan","Component Code","Location","BD Aging Days","Est RFU"]],
-      body: rows,
-      startY: 20,
-      styles: { fontSize: 10 }
-    });
+    doc.text(Category: ${cat},20,15); // ✅ pakai backtick
+    const rows=data[cat].map(r=>[r.equipment,r.downTime,r.ltr,r.action,r.compCode,r.loc,r.bdAging,r.rfu]);
+    doc.autoTable({head:[["Equipment","Actual Down Time","LTR Status","Action Plan","Component Code","Location","BD Aging Days","Est RFU"]],body:rows,startY:20,styles:{fontSize:10}});
   });
-
   doc.save("monitoring.pdf");
-});
+};
 
 renderTable();
 </script>
