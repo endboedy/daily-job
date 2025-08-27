@@ -29,9 +29,14 @@
       font-size: 11px;
     }
 
-    .small { width: 50px; }
-    .medium { width: 80px; }
-    .large { width: 120px; }
+    th {
+      background: #e0e0e0;
+      -webkit-print-color-adjust: exact;
+    }
+
+    .small { width: 40px; }
+    .medium { width: 70px; }
+    .large { width: 200px; }
 
     .text-left { text-align: left; }
     .text-right { text-align: right; }
@@ -39,8 +44,9 @@
 
     .category-row {
       background: #ffeb99;
-      text-align: left;
       font-weight: bold;
+      text-align: left;
+      -webkit-print-color-adjust: exact;
     }
 
     .btn {
@@ -122,6 +128,16 @@
         font-size: 12px;
         margin-bottom: 5px;
       }
+
+      th {
+        background: #e0e0e0 !important;
+        -webkit-print-color-adjust: exact;
+      }
+
+      .category-row {
+        background: #ffeb99 !important;
+        -webkit-print-color-adjust: exact;
+      }
     }
   </style>
 </head>
@@ -157,7 +173,7 @@ function renderTable() {
           <th class="small text-left">LTR Status</th>
           <th class="large text-left">Action Plan</th>
           <th class="medium text-left">Component Code</th>
-          <th class="medium text-left">Location</th>
+          <th class="small text-left">Location</th>
           <th class="small text-center">BD Aging Days</th>
           <th class="small text-right">Est RFU</th>
           <th class="small text-center">Action</th>
