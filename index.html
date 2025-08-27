@@ -7,16 +7,25 @@
     body { font-family: Arial, sans-serif; margin: 20px; font-size: 12px; }
     h2 { margin-bottom: 10px; }
     table { border-collapse: collapse; margin-bottom: 30px; width: 100%; font-weight: normal; }
-    th, td { border: 1px solid #999; padding: 4px; text-align: center; }
-    th.small { width: 100px; }
-    th.medium { width: 150px; }
-    th.large { width: 280px; } /* Action Plan lebih lebar */
+    th, td { border: 1px solid #999; padding: 4px; font-size: 12px; }
+
+    /* ukuran kolom */
+    .small { width: 80px; }
+    .medium { width: 120px; }
+    .large { width: 250px; }
+
+    /* align */
+    .text-left { text-align: left; }
+    .text-right { text-align: right; }
+    .text-center { text-align: center; }
+
+    /* kategori */
     .category-row {
-  background: #ffeb99; 
-  text-align: center;  /* <- dari left jadi center */
-  font-weight: bold;
-}
-    .category-row { background: #ffeb99; text-align: left; font-weight: bold; }
+      background: #ffeb99; 
+      text-align: left; 
+      font-weight: bold;
+    }
+
     .btn { padding: 2px 6px; margin: 2px; cursor: pointer; background: #007bff; color: white; border: none; border-radius: 3px; font-size: 11px; }
     .btn:hover { background: #0056b3; }
     .action-btn { margin: 0 3px; cursor: pointer; color: blue; text-decoration: underline; font-size: 11px; }
@@ -46,30 +55,30 @@ function renderTable() {
       <table>
         <tr class="category-row"><td colspan="9">${cat}</td></tr>
         <tr>
-          <th class="small">Equipment</th>
-          <th class="small">Actual Down Time</th>
-          <th class="small">LTR Status</th>
-          <th class="large">Action Plan</th>
-          <th class="medium">Component Code</th>
-          <th class="medium">Location</th>
-          <th class="small">BD Aging Days</th>
-          <th class="small">Est RFU</th>
-          <th class="small">Action</th>
+          <th class="small text-left">Equipment</th>
+          <th class="small text-right">Actual Down Time</th>
+          <th class="small text-left">LTR Status</th>
+          <th class="large text-left">Action Plan</th>
+          <th class="medium text-left">Component Code</th>
+          <th class="medium text-left">Location</th>
+          <th class="small text-center">BD Aging Days</th>
+          <th class="small text-right">Est RFU</th>
+          <th class="small text-center">Action</th>
         </tr>
     `;
 
     data[cat].forEach((row, i) => {
       html += `
         <tr>
-          <td>${row.equipment}</td>
-          <td>${row.downTime}</td>
-          <td>${row.ltr}</td>
-          <td>${row.action}</td>
-          <td>${row.compCode}</td>
-          <td>${row.loc}</td>
-          <td>${row.bdAging}</td>
-          <td>${row.rfu}</td>
-          <td>
+          <td class="text-left">${row.equipment}</td>
+          <td class="text-right">${row.downTime}</td>
+          <td class="text-left">${row.ltr}</td>
+          <td class="text-left">${row.action}</td>
+          <td class="text-left">${row.compCode}</td>
+          <td class="text-left">${row.loc}</td>
+          <td class="text-center">${row.bdAging}</td>
+          <td class="text-right">${row.rfu}</td>
+          <td class="text-center">
             <span class="action-btn" onclick="editRow('${cat}', ${i})">Edit</span>
             <span class="action-btn" onclick="deleteRow('${cat}', ${i})">Delete</span>
           </td>
@@ -79,7 +88,7 @@ function renderTable() {
     html += `
       <tr>
         <td colspan="8"></td>
-        <td><button class="btn" onclick="addRow('${cat}')">+ Add</button></td>
+        <td class="text-center"><button class="btn" onclick="addRow('${cat}')">+ Add</button></td>
       </tr>
       </table>
     `;
@@ -111,7 +120,7 @@ function editRow(cat, idx) {
     <td><input value="${row.loc}"></td>
     <td>${row.bdAging}</td>
     <td><input type="date" value="${row.rfu}"></td>
-    <td>
+    <td class="text-center">
       <span class="action-btn" onclick="saveRow('${cat}', ${idx}, this)">Save</span>
       <span class="action-btn" onclick="renderTable()">Cancel</span>
     </td>
