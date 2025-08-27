@@ -10,9 +10,7 @@
     font-size: 12px; 
   }
 
-  h2 { 
-    margin-bottom: 10px; 
-  }
+  h2 { margin-bottom: 10px; }
 
   table { 
     border-collapse: collapse; 
@@ -26,7 +24,7 @@
     padding: 4px; 
     font-size: 12px; 
     text-align: center; 
-    background: #e0e0e0;  /* abu-abu untuk header */
+    background: #e0e0e0; 
   }
 
   td { 
@@ -35,17 +33,14 @@
     font-size: 12px; 
   }
 
-  /* ukuran kolom */
   .small { width: 80px; }
   .medium { width: 120px; }
   .large { width: 250px; }
 
-  /* align */
   .text-left { text-align: left; }
   .text-right { text-align: right; }
   .text-center { text-align: center; }
 
-  /* kategori */
   .category-row {
     background: #ffeb99; 
     text-align: left; 
@@ -79,7 +74,6 @@
     font-size: 12px; 
   }
 
-  /* top bar kanan */
   .top-bar {
     display: flex;
     justify-content: flex-end;
@@ -88,10 +82,7 @@
     gap: 6px;
   }
 
-  /* sembunyikan input file asli */
-  #loadFile {
-    display: none;
-  }
+  #loadFile { display: none; }
 
   .custom-file-label {
     padding: 3px 8px;
@@ -130,6 +121,13 @@ function renderTable() {
   container.innerHTML = "";
 
   categories.forEach(cat => {
+    // Sort descending by aging days
+    data[cat].sort((a, b) => {
+      const agingA = a.downTime ? Math.ceil((new Date() - new Date(a.downTime)) / (1000*60*60*24)) : -99999;
+      const agingB = b.downTime ? Math.ceil((new Date() - new Date(b.downTime)) / (1000*60*60*24)) : -99999;
+      return agingB - agingA;
+    });
+
     let html = `
       <table>
         <tr class="category-row"><td colspan="9">${cat}</td></tr>
@@ -147,6 +145,9 @@ function renderTable() {
     `;
 
     data[cat].forEach((row, i) => {
+      const bdAging = row.downTime ? 
+        Math.ceil((new Date() - new Date(row.downTime)) / (1000*60*60*24)) : "";
+
       html += `
         <tr>
           <td class="text-left">${row.equipment}</td>
@@ -155,7 +156,7 @@ function renderTable() {
           <td class="text-left">${row.action}</td>
           <td class="text-left">${row.compCode}</td>
           <td class="text-left">${row.loc}</td>
-          <td class="text-center">${row.bdAging}</td>
+          <td class="text-center">${bdAging}</td>
           <td class="text-right">${row.rfu}</td>
           <td class="text-center">
             <span class="action-btn" onclick="editRow('${cat}', ${i})">Edit</span>
@@ -179,7 +180,7 @@ function renderTable() {
 function addRow(cat) {
   data[cat].push({
     equipment: "", downTime: "", ltr: "", compCode: "",
-    action: "", loc: "", bdAging: "", rfu: ""
+    action: "", loc: "", rfu: ""
   });
   editRow(cat, data[cat].length - 1);
 }
@@ -197,7 +198,7 @@ function editRow(cat, idx) {
     <td><input value="${row.action}"></td>
     <td><input value="${row.compCode}"></td>
     <td><input value="${row.loc}"></td>
-    <td>${row.bdAging}</td>
+    <td></td>
     <td><input type="date" value="${row.rfu}"></td>
     <td class="text-center">
       <span class="action-btn" onclick="saveRow('${cat}', ${idx}, this)">Save</span>
@@ -208,21 +209,14 @@ function editRow(cat, idx) {
 
 function saveRow(cat, idx, el) {
   const inputs = el.closest("tr").querySelectorAll("input");
-  const down = inputs[1].value, rfu = inputs[6].value;
-
-  // ✅ Rumus revisi: NOW - Actual Downtime
-  const bdAging = down ? 
-    Math.ceil((new Date() - new Date(down)) / (1000*60*60*24)) : "";
-
   data[cat][idx] = {
     equipment: inputs[0].value,
-    downTime: down,
+    downTime: inputs[1].value,
     ltr: inputs[2].value,
     action: inputs[3].value,
     compCode: inputs[4].value,
     loc: inputs[5].value,
-    bdAging: bdAging,
-    rfu: rfu
+    rfu: inputs[6].value
   };
   renderTable();
 }
