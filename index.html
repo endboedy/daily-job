@@ -1,3 +1,8 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Monitoring Equipment</title>
 <style>
   body { 
     font-family: Arial, sans-serif; 
@@ -48,7 +53,7 @@
   }
 
   .btn { 
-    padding: 2px 6px; 
+    padding: 3px 8px; 
     margin: 2px; 
     cursor: pointer; 
     background: #007bff; 
@@ -71,14 +76,46 @@
   input { 
     width: 95%; 
     padding: 2px; 
-    font-size: 12px; 
-  }
+    font-size: 12px; 
+  }
+
+  /* top bar kanan */
+  .top-bar {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    margin-bottom: 10px;
+    gap: 6px;
+  }
+
+  /* sembunyikan input file asli */
+  #loadFile {
+    display: none;
+  }
+
+  .custom-file-label {
+    padding: 3px 8px;
+    background: #6c757d;
+    color: white;
+    border-radius: 3px;
+    font-size: 12px;
+    cursor: pointer;
+  }
+
+  .custom-file-label:hover {
+    background: #5a6268;
+  }
 </style>
+</head>
+<body>
 
   <h2>Monitoring Equipment</h2>
 
-  <button id="saveBtn" class="btn">Save JSON</button>
-  <input type="file" id="loadFile">
+  <div class="top-bar">
+    <button id="saveBtn" class="btn">Save JSON</button>
+    <label for="loadFile" class="custom-file-label">Choose File</label>
+    <input type="file" id="loadFile" accept=".json">
+  </div>
 
   <div id="tableContainer"></div>
 
@@ -203,6 +240,7 @@ document.getElementById("saveBtn").addEventListener("click", () => {
 
 document.getElementById("loadFile").addEventListener("change", function(e){
   const file = e.target.files[0];
+  if (!file) return;
   const reader = new FileReader();
   reader.onload = () => {
     data = JSON.parse(reader.result);
