@@ -209,8 +209,10 @@ function editRow(cat, idx) {
 function saveRow(cat, idx, el) {
   const inputs = el.closest("tr").querySelectorAll("input");
   const down = inputs[1].value, rfu = inputs[6].value;
-  const bdAging = (down && rfu) ? 
-    Math.ceil((new Date(rfu) - new Date(down)) / (1000*60*60*24)) : "";
+
+  // ✅ Rumus revisi: NOW - Actual Downtime
+  const bdAging = down ? 
+    Math.ceil((new Date() - new Date(down)) / (1000*60*60*24)) : "";
 
   data[cat][idx] = {
     equipment: inputs[0].value,
