@@ -138,15 +138,14 @@ let reportData = [
 ];
 
 /* ========== UTIL ========== */
-function formatDisplayDateISO(isoOrEmpty) {
-  if(!isoOrEmpty) return "";
-  // iso may be "YYYY-MM-DD" or "YYYY-MM-DDTHH:MM"
-  const d = new Date(isoOrEmpty);
-  if(isNaN(d)) return isoOrEmpty;
-  // dd-MMM-yyyy
-  const day = String(d.getDate()).padStart(2,'0');
-  const monNames = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
-  return ${day}-${monNames[d.getMonth()]}-${d.getFullYear()};
+function formatDate(dateStr) {
+    if (!dateStr) return ""; // kalau kosong jangan error
+    const d = new Date(dateStr);
+    if (isNaN(d)) return ""; // kalau bukan tanggal valid
+    const day = String(d.getDate()).padStart(2, '0');
+    const monNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", 
+                      "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    return ${day}-${monNames[d.getMonth()]}-${d.getFullYear()};
 }
 
 /* ========== RENDER DAILY ========== */
