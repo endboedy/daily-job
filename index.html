@@ -26,11 +26,31 @@
     .custom-file-label { padding: 3px 8px; background: #6c757d; color: white; border-radius: 3px; font-size: 12px; cursor: pointer; }
     .custom-file-label:hover { background: #5a6268; }
 
-    @media print {
-      .top-bar, .btn, .action-btn, input { display: none !important; }
-      body { font-size: 10px; }
-      table { page-break-inside: avoid; }
-    }
+   
+@media print {
+  body {
+    font-size: 9px;
+    margin: 10px;
+  }
+
+  .top-bar, .btn, .action-btn, input {
+    display: none !important;
+  }
+
+  table {
+    font-size: 9px;
+    width: 100%;
+  }
+
+  th, td {
+    padding: 2px;
+  }
+
+  .small { width: 60px; }
+  .medium { width: 90px; }
+  .large { width: 150px; }
+}
+
   </style>
 </head>
 <body>
