@@ -1,459 +1,156 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Monitoring Equipment - Daily & Table</title>
-<style>
-  :root {
-    --yellow: #ffeb99;
-    --muted-border: #999;
-    --accent: #0b5ed7;
-  }
-  body { font-family: Arial, sans-serif; margin: 18px; font-size: 13px; color: #222; }
-  h1 { margin: 0 0 8px 0; font-size: 18px; }
-  .tabs { display:flex; gap:8px; margin-bottom:10px; }
-  .tab { padding:6px 12px; background:#eee; border-radius:4px; cursor:pointer; user-select:none; }
-  .tab.active { background: var(--accent); color:#fff; }
-  .controls { margin: 8px 0 12px; display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
-  .btn { padding:6px 10px; border:none; background:var(--accent); color:#fff; border-radius:4px; cursor:pointer;}
-  .btn.secondary { background:#6c757d; }
-  input[type=file] { font-size: 13px; }
-  #searchDaily { width: 100%; padding:6px; box-sizing:border-box; margin-bottom:8px; }
+  <meta charset="UTF-8">
+  <title>Monitoring Equipment</title>
+  <style>
+    body { font-family: Arial, sans-serif; font-size: 12px; margin: 20px; }
+    h2 { margin-bottom: 10px; }
+    .menu { margin-bottom: 15px; }
+    .menu button {
+      padding: 6px 12px; margin-right: 6px; border: none; cursor: pointer;
+      background: #2c3e50; color: white; border-radius: 4px;
+    }
+    .menu button.active { background: #3498db; }
+    .hidden { display: none; }
 
-  /* Tables */
-  table { border-collapse: collapse; width:100%; margin-bottom:16px; }
-  thead th { background:#f2f2f2; border:1px solid var(--muted-border); padding:6px; font-weight:600; font-size:12px; }
-  tbody td, thead th { border:1px solid var(--muted-border); padding:6px; vertical-align:middle; font-size:12px; }
-  /* category row */
-  .category-row td { background: var(--yellow); font-weight:600; text-align:left; padding:6px 10px; }
-  /* sizes */
-  td.col-equipment { width:110px; text-align:left; padding-left:8px; }
-  td.col-downtime { width:120px; }
-  td.col-ltr { width:140px; }
-  td.col-comp { width:260px; text-align:left; padding-left:8px; }
-  td.col-plan { width:340px; text-align:left; padding-left:8px; }
-  td.col-location { width:120px; }
-  td.col-aging { width:90px; }
-  td.col-rfu { width:120px; }
-  td.col-action { width:100px; }
+    /* table style */
+    table { border-collapse: collapse; width: 100%; margin-bottom: 20px; }
+    th, td {
+      border: 1px solid #888; padding: 4px 6px; text-align: left;
+    }
+    th { background: #f2f2f2; }
+    td input { width: 100%; font-size: 12px; }
 
-  .action-link { color:#0b5ed7; cursor:pointer; text-decoration:underline; font-size:12px; margin-right:6px; }
-  input[type="text"], input[type="date"], input[type="datetime-local"], textarea {
-    padding:4px; font-size:12px; width:100%; box-sizing:border-box;
-  }
-  textarea { resize:vertical; min-height:34px; max-height:120px; }
-
-  /* compact rows */
-  th, td { padding-top:6px; padding-bottom:6px; }
-  /* Table tab styles */
-  .report-grid { display:flex; gap:16px; flex-wrap:wrap; }
-  .cluster { border:1px solid var(--muted-border); background:#fff; min-width:260px; max-width:420px; }
-  .cluster .header { background:#032b5c; color:#fff; padding:8px; font-weight:700; }
-  .cluster table { width:100%; border:none; }
-  .cluster td, .cluster th { border:none; padding:6px; font-size:12px; }
-  .smallnum { width:48px; }
-  .center { text-align:center; }
-
-  /* responsive */
-  @media (max-width:800px){
-    td.col-plan { width:180px; }
-    .cluster { max-width:100%; }
-  }
-</style>
+    /* kategori Daily */
+    .category {
+      background: yellow; font-weight: bold; text-align: left;
+    }
+    .daily-header { background: navy; color: white; font-weight: bold; }
+    .daily-green { background: #c6efce; }
+    .daily-yellow { background: #ffeb9c; }
+  </style>
 </head>
 <body>
 
-<h1>Monitoring Equipment</h1>
-
-<div class="tabs">
-  <div id="tabDaily" class="tab active">1. Daily</div>
-  <div id="tabTable" class="tab">2. Table</div>
-</div>
-
-<div class="controls">
-  <button id="saveAll" class="btn">Save JSON</button>
-  <label class="btn secondary" style="display:inline-block; padding:6px 8px; cursor:pointer;">
-    Load JSON <input id="fileLoad" type="file" accept=".json" style="display:none">
-  </label>
-  <div style="flex:1"></div>
-  <div id="todayLabel" style="font-size:12px; color:#555">Update: <span id="updateDate"></span></div>
-</div>
-
-<!-- CONTENT: Daily -->
-<div id="contentDaily">
-
-  <input id="searchDaily" placeholder="Cari data (Equipment, Plan, Location, dsb)..." oninput="renderDaily()">
-
-  <div id="dailyContainer"></div>
-
-</div>
-
-<!-- CONTENT: Table (report) -->
-<div id="contentTable" style="display:none;">
-  <div style="margin-bottom:8px;">
-    <button class="btn" onclick="addSampleReport()">+ Add Sample Cluster</button>
-    <button class="btn" onclick="resetReport()">Reset Report</button>
+  <div class="menu">
+    <button id="menu1" class="active">Daily</button>
+    <button id="menu2">Table</button>
   </div>
 
-  <div class="report-grid" id="reportGrid"></div>
-</div>
+  <!-- DAILY SECTION -->
+  <div id="dailySection">
+    <h2>Daily Report</h2>
+    <table>
+      <tr class="daily-header">
+        <th>Loader</th><th>W1</th><th>W2</th><th>W3</th><th>W4</th><th>W5</th>
+      </tr>
+      <tr><td class="category">POP</td><td>20</td><td>20</td><td>20</td><td>20</td><td>20</td></tr>
+      <tr><td>LTR</td><td>2</td><td>0</td><td>1</td><td>1</td><td>0</td></tr>
+      <tr><td>PM</td><td>1</td><td>1</td><td>0</td><td>2</td><td>1</td></tr>
+      <tr class="daily-green"><td>Total RFU</td><td>19</td><td>18</td><td>16</td><td>18</td><td>18</td></tr>
+      <tr class="daily-green"><td>Total BD</td><td>1</td><td>2</td><td>4</td><td>2</td><td>2</td></tr>
+      <tr class="daily-yellow"><td>PA Projection</td><td>95%</td><td>90%</td><td>80%</td><td>90%</td><td>90%</td></tr>
+    </table>
+  </div>
+
+  <!-- TABLE SECTION -->
+  <div id="tableSection" class="hidden">
+    <h2>Monitoring Equipment</h2>
+    <button onclick="saveJSON()">Save JSON</button>
+    <input type="file" id="fileInput" />
+
+    <table id="equipmentTable">
+      <thead>
+        <tr>
+          <th>Equipment</th>
+          <th>Actual Down Time</th>
+          <th>LTR Status</th>
+          <th>Component Code</th>
+          <th style="width:200px;">Action Plan</th>
+          <th>Location</th>
+          <th>BD Aging Days</th>
+          <th>Est RFU</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody id="tableBody"></tbody>
+    </table>
+  </div>
 
 <script>
-/* ========== DATA STRUCTURES ========== */
-const categories = ["Loading", "Hauling", "Auxiliary", "Coal Getting", "Dozing", "Grading", "Water Truck"];
-
-// daily data shape: dataDaily[category] = [ { equipment, downTime, ltr, compCode, actionPlan, loc, bdAging, rfu } ]
-let dataDaily = {};
-categories.forEach(c => dataDaily[c] = []);
-
-// report data: array of clusters { title, rows: [ {label, w1..w5, total} ], bdRows: [ {label, w1..w5, total} ] }
-// We'll compute totals and PA Projection automatically
-let reportData = [
-  // sample initial cluster (you can delete)
-  {
-    title: "Sitarum Loader",
-    rows: [
-      { label: "POP", w:[20,20,20,20,20] },
-      { label: "LTR", w:[2,1,0,0,0] },
-      { label: "Unschedule", w:[0,0,0,0,0] },
-      { label: "PM", w:[1,0,2,0,2] }
-    ],
-    bdRows: [
-      { label: "Total BD", w:[1,2,4,2,1] }
-    ]
-  },
-  {
-    title: "Tabuhan Loader",
-    rows: [
-      { label: "POP", w:[13,13,13,13,13] },
-      { label: "LTR", w:[1,1,1,1,1] },
-      { label: "Unschedule", w:[0,0,0,0,0] },
-      { label: "PM", w:[1,1,1,1,1] }
-    ],
-    bdRows: [
-      { label: "Total BD", w:[1,1,1,1,1] }
-    ]
-  }
-];
-
-/* ========== UTIL ========== */
+/* ======== UTIL ======== */
 function formatDate(dateStr) {
-    if (!dateStr) return ""; // kalau kosong jangan error
-    const d = new Date(dateStr);
-    if (isNaN(d)) return ""; // kalau bukan tanggal valid
-    const day = String(d.getDate()).padStart(2, '0');
-    const monNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", 
-                      "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-    return ${day}-${monNames[d.getMonth()]}-${d.getFullYear()};
+  if (!dateStr) return "";
+  const d = new Date(dateStr);
+  if (isNaN(d)) return "";
+  const day = String(d.getDate()).padStart(2, '0');
+  const monNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", 
+                    "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  return ${day}-${monNames[d.getMonth()]}-${d.getFullYear()};
 }
 
-/* ========== RENDER DAILY ========== */
-function renderDaily() {
-  const container = document.getElementById("dailyContainer");
-  container.innerHTML = "";
-  const q = document.getElementById("searchDaily").value.trim().toLowerCase();
+/* ======== DATA ======== */
+let equipments = [];
 
-  categories.forEach((cat) => {
-    // build table HTML
-    const table = document.createElement("table");
-    table.innerHTML = `
-      <tr class="category-row"><td colspan="9">${cat}</td></tr>
-      <tr>
-        <th class="col-equipment">Equipment</th>
-        <th class="col-downtime">Actual Down Time</th>
-        <th class="col-ltr">LTR Status</th>
-        <th class="col-plan">Action Plan</th>
-        <th class="col-comp">Component Code</th>
-        <th class="col-location">Location</th>
-        <th class="col-aging">BD Aging Days</th>
-        <th class="col-rfu">Est RFU</th>
-        <th class="col-action">Action</th>
-      </tr>
+/* ======== RENDER ======== */
+function renderTable() {
+  const tbody = document.getElementById("tableBody");
+  tbody.innerHTML = "";
+  equipments.forEach((row, idx) => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td><input value="${row.equipment||""}"></td>
+      <td><input value="${row.down||""}"></td>
+      <td><input value="${row.ltr||""}"></td>
+      <td><input value="${row.code||""}"></td>
+      <td><input style="width:200px" value="${row.action||""}"></td>
+      <td><input value="${row.location||""}"></td>
+      <td><input value="${row.bd||""}"></td>
+      <td><input value="${formatDate(row.rfu)||""}"></td>
+      <td><button onclick="deleteRow(${idx})">Del</button></td>
     `;
-
-    // iterate rows (filter by search)
-    const rows = dataDaily[cat] || [];
-    rows.forEach((r, idx) => {
-      const combined = Object.values(r).join(" ").toLowerCase();
-      if(q && !combined.includes(q)) return; // skip if not match
-
-      const tr = document.createElement("tr");
-      // show mode view; when editing we replace row with inputs
-      tr.innerHTML = `
-        <td class="col-equipment">${escapeHtml(r.equipment)}</td>
-        <td class="col-downtime">${formatDisplayDateISO(r.downTime)}</td>
-        <td class="col-ltr">${escapeHtml(r.ltr)}</td>
-        <td class="col-plan">${escapeHtml(r.actionPlan)}</td>
-        <td class="col-comp">${escapeHtml(r.compCode)}</td>
-        <td class="col-location">${escapeHtml(r.loc)}</td>
-        <td class="col-aging center">${r.bdAging || ""}</td>
-        <td class="col-rfu">${formatDisplayDateISO(r.rfu)}</td>
-        <td class="col-action">
-          <span class="action-link" onclick="editDaily('${cat}',${idx})">Edit</span>
-          <span class="action-link" onclick="deleteDaily('${cat}',${idx})">Delete</span>
-        </td>
-      `;
-      table.appendChild(tr);
-    });
-
-    // add final row with Add button in Action column (right aligned)
-    const addRow = document.createElement("tr");
-    addRow.innerHTML = <td colspan="8"></td><td class="col-action"><button class="btn" onclick="addDaily('${cat}')">+ Add</button></td>;
-    table.appendChild(addRow);
-
-    container.appendChild(table);
+    tbody.appendChild(tr);
   });
 }
 
-/* escape html small helper */
-function escapeHtml(s){
-  if(s === undefined || s === null) return "";
-  return String(s)
-    .replaceAll("&","&amp;")
-    .replaceAll("<","&lt;")
-    .replaceAll(">","&gt;");
-}
+function deleteRow(i){ equipments.splice(i,1); renderTable(); }
 
-/* ========== DAILY ACTIONS ========== */
-
-function addDaily(cat) {
-  // push empty and open editor for last row
-  dataDaily[cat].push({
-    equipment: "", downTime: "", ltr: "", actionPlan: "", compCode: "", loc: "", bdAging: "", rfu: ""
-  });
-  renderDaily();
-  // auto-edit last row: find index
-  const idx = dataDaily[cat].length - 1;
-  setTimeout(()=> editDaily(cat, idx), 50);
-}
-
-function editDaily(cat, idx) {
-  // find the table row element and replace with edit inputs
-  const container = document.getElementById("dailyContainer");
-  const table = container.getElementsByTagName("table")[categories.indexOf(cat)];
-  if(!table) return;
-  const rEl = table.rows[idx+2]; // offset: header (0) + column headers (1)
-  const record = dataDaily[cat][idx];
-  if(!rEl) return;
-
-  rEl.innerHTML = `
-    <td class="col-equipment"><input type="text" id="inp_eq_${cat}_${idx}" value="${escapeAttr(record.equipment)}"></td>
-    <td class="col-downtime"><input type="date" id="inp_dt_${cat}_${idx}" value="${record.downTime ? record.downTime.split('T')[0] : ''}"></td>
-    <td class="col-ltr"><input type="text" id="inp_ltr_${cat}_${idx}" value="${escapeAttr(record.ltr)}"></td>
-    <td class="col-plan"><textarea id="inp_plan_${cat}_${idx}">${escapeAttr(record.actionPlan)}</textarea></td>
-    <td class="col-comp"><input type="text" id="inp_comp_${cat}_${idx}" value="${escapeAttr(record.compCode)}"></td>
-    <td class="col-location"><input type="text" id="inp_loc_${cat}_${idx}" value="${escapeAttr(record.loc)}"></td>
-    <td class="col-aging center">${record.bdAging || ""}</td>
-    <td class="col-rfu"><input type="date" id="inp_rfu_${cat}_${idx}" value="${record.rfu ? record.rfu.split('T')[0] : ''}"></td>
-    <td class="col-action">
-      <button class="btn" onclick="saveDaily('${cat}',${idx})">Save</button>
-      <button class="btn secondary" onclick="renderDaily()">Cancel</button>
-    </td>
-  `;
-}
-
-function escapeAttr(s){ if(s===undefined||s===null) return ""; return String(s).replaceAll('"','&quot;'); }
-
-function saveDaily(cat, idx) {
-  const eq = document.getElementById(inp_eq_${cat}_${idx}).value.trim();
-  const dt = document.getElementById(inp_dt_${cat}_${idx}).value; // yyyy-mm-dd
-  const ltr = document.getElementById(inp_ltr_${cat}_${idx}).value.trim();
-  const plan = document.getElementById(inp_plan_${cat}_${idx}).value.trim();
-  const comp = document.getElementById(inp_comp_${cat}_${idx}).value.trim();
-  const loc = document.getElementById(inp_loc_${cat}_${idx}).value.trim();
-  const rfu = document.getElementById(inp_rfu_${cat}_${idx}).value;
-
-  const bd = (dt && rfu) ? Math.ceil((new Date(rfu) - new Date(dt)) / (1000*60*60*24)) : "";
-
-  dataDaily[cat][idx] = {
-    equipment: eq,
-    downTime: dt ? dt : "",
-    ltr: ltr,
-    actionPlan: plan,
-    compCode: comp,
-    loc: loc,
-    bdAging: bd,
-    rfu: rfu ? rfu : ""
-  };
-  renderDaily();
-}
-
-function deleteDaily(cat, idx) {
-  if(!confirm("Hapus baris ini?")) return;
-  dataDaily[cat].splice(idx,1);
-  renderDaily();
-}
-
-/* ========== REPORT / TABLE TAB ========== */
-
-function renderReport() {
-  const container = document.getElementById("reportGrid");
-  container.innerHTML = "";
-  reportData.forEach((cluster, cIdx) => {
-    const box = document.createElement("div");
-    box.className = "cluster";
-    box.innerHTML = <div class="header">${escapeHtml(cluster.title)}</div>;
-    // inner table
-    const tbl = document.createElement("table");
-    // header row W1..W5
-    let inner = <tr><th></th><th class="smallnum center">W1</th><th class="smallnum center">W2</th><th class="smallnum center">W3</th><th class="smallnum center">W4</th><th class="smallnum center">W5</th><th class="center">Total RFU</th></tr>;
-    // data rows
-    cluster.rows.forEach((r, rIdx) => {
-      const totals = sumArr(r.w);
-      inner += `<tr>
-        <td>${escapeHtml(r.label)}</td>
-        ${r.w.map((v, j)=> <td class="center"><input style="width:48px;text-align:center" type="number" value="${v}" onchange="updateReportCell(${cIdx},${rIdx},${j}, this.value, 'rows')"></td>).join("")}
-        <td class="center">${totals}</td>
-      </tr>`;
-    });
-    // total RFU row (computed)
-    const totalRFU = cluster.rows.reduce((s, rr)=> s + sumArr(rr.w), 0);
-    inner += <tr style="background:#dff0d8; font-weight:600"><td>Total RFU</td><td colspan="5"></td><td class="center">${totalRFU}</td></tr>;
-
-    // bdRows (Total BD)
-    cluster.bdRows.forEach((b, bIdx) => {
-      const totals = sumArr(b.w);
-      inner += `<tr style="background:#fff3cd"><td>${escapeHtml(b.label)}</td>
-        ${b.w.map((v,j)=> <td class="center"><input style="width:48px;text-align:center" type="number" value="${v}" onchange="updateReportCell(${cIdx},${bIdx},${j}, this.value, 'bdRows')"></td>).join("")}
-        <td class="center">${totals}</td>
-      </tr>`;
-    });
-    const totalBD = cluster.bdRows.reduce((s, bb)=> s + sumArr(bb.w), 0);
-    inner += <tr style="background:#ffe8cc; font-weight:600"><td>Total BD</td><td colspan="5"></td><td class="center">${totalBD}</td></tr>;
-
-    // PA Projection row
-    const pa = (totalRFU + totalBD) > 0 ? Math.round((totalRFU / (totalRFU + totalBD)) * 100) : 0;
-    inner += <tr style="background:#fcf8e3"><td>PA Projection</td><td colspan="5"></td><td class="center">${pa}%</td></tr>;
-
-    inner += `<tr><td colspan="7" class="center" style="padding-top:8px">
-      <button class="btn" onclick="addRowToCluster(${cIdx})">+ Add Row</button>
-      <button class="btn secondary" onclick="addBDRowToCluster(${cIdx})">+ Add BD Row</button>
-      <button class="btn" onclick="renameCluster(${cIdx})">Rename</button>
-      <button class="btn secondary" onclick="deleteCluster(${cIdx})">Delete Cluster</button>
-    </td></tr>`;
-
-    tbl.innerHTML = inner;
-    box.appendChild(tbl);
-    container.appendChild(box);
-  });
-}
-
-/* helpers for report editing */
-function sumArr(arr){ return (arr||[]).reduce((s,v)=> s + (Number(v)||0), 0); }
-
-function updateReportCell(clusterIdx, rowIdx, weekIdx, val, section){
-  const num = Number(val) || 0;
-  if(section === 'rows'){
-    reportData[clusterIdx].rows[rowIdx].w[weekIdx] = num;
-  } else {
-    reportData[clusterIdx].bdRows[rowIdx].w[weekIdx] = num;
-  }
-  renderReport();
-}
-function addRowToCluster(cIdx){
-  reportData[cIdx].rows.push({ label: "NEW", w:[0,0,0,0,0]});
-  renderReport();
-}
-function addBDRowToCluster(cIdx){
-  reportData[cIdx].bdRows.push({ label: "BD", w:[0,0,0,0,0]});
-  renderReport();
-}
-function renameCluster(cIdx){
-  const newName = prompt("Nama cluster:", reportData[cIdx].title);
-  if(newName) { reportData[cIdx].title = newName; renderReport(); }
-}
-function deleteCluster(cIdx){
-  if(!confirm("Hapus cluster ini?")) return;
-  reportData.splice(cIdx,1);
-  renderReport();
-}
-function addSampleReport(){
-  reportData.push({
-    title: "New Cluster",
-    rows: [{label:"POP", w:[0,0,0,0,0]}],
-    bdRows: [{label:"Total BD", w:[0,0,0,0,0]}]
-  });
-  renderReport();
-}
-function resetReport(){
-  if(!confirm("Reset semua report data?")) return;
-  reportData = [];
-  renderReport();
-}
-
-/* ========== SAVE / LOAD JSON (Daily + Report) ========== */
-document.getElementById("saveAll").addEventListener("click", ()=> {
-  const payload = { daily: dataDaily, report: reportData, meta:{updated: new Date().toISOString()} };
-  const blob = new Blob([JSON.stringify(payload, null, 2)], {type:'application/json'});
-  const a = document.createElement('a');
+/* ======== FILE ======== */
+function saveJSON(){
+  const blob = new Blob([JSON.stringify(equipments)], {type:"application/json"});
+  const a = document.createElement("a");
   a.href = URL.createObjectURL(blob);
-  a.download = 'monitoring_all.json';
+  a.download = "equipments.json";
   a.click();
-});
-
-document.getElementById("fileLoad").addEventListener("change", function(e){
+}
+document.getElementById("fileInput").addEventListener("change", e=>{
   const file = e.target.files[0];
-  if(!file) return;
+  if (!file) return;
   const reader = new FileReader();
-  reader.onload = () => {
-    try {
-      const obj = JSON.parse(reader.result);
-      if(obj.daily) dataDaily = obj.daily;
-      if(obj.report) reportData = obj.report;
-      // ensure categories exist
-      categories.forEach(c => { if(!dataDaily[c]) dataDaily[c] = []; });
-      renderDaily(); renderReport(); setUpdateLabel(obj.meta?.updated || new Date().toISOString());
-    } catch(err){
-      alert("File JSON tidak valid: " + err.message);
-    }
+  reader.onload = evt => {
+    equipments = JSON.parse(evt.target.result);
+    renderTable();
   };
   reader.readAsText(file);
 });
 
-/* ========== TAB SWITCH ========== */
-document.getElementById("tabDaily").addEventListener("click", ()=>{
-  showTab('daily');
+/* ======== MENU ======== */
+document.getElementById("menu1").addEventListener("click", ()=>{
+  document.getElementById("dailySection").classList.remove("hidden");
+  document.getElementById("tableSection").classList.add("hidden");
+  document.getElementById("menu1").classList.add("active");
+  document.getElementById("menu2").classList.remove("active");
 });
-document.getElementById("tabTable").addEventListener("click", ()=>{
-  showTab('table');
+document.getElementById("menu2").addEventListener("click", ()=>{
+  document.getElementById("tableSection").classList.remove("hidden");
+  document.getElementById("dailySection").classList.add("hidden");
+  document.getElementById("menu2").classList.add("active");
+  document.getElementById("menu1").classList.remove("active");
 });
-function showTab(name){
-  document.getElementById("tabDaily").classList.toggle('active', name==='daily');
-  document.getElementById("tabTable").classList.toggle('active', name==='table');
-  document.getElementById("contentDaily").style.display = (name==='daily' ? 'block' : 'none');
-  document.getElementById("contentTable").style.display = (name==='table' ? 'block' : 'none');
-}
 
-/* ========== INIT / SAMPLE ========== */
-// small sample row to show layout
-dataDaily["Loading"].push({
-  equipment:"CE7136",
-  downTime:"2025-08-13",
-  ltr:"On Going LTR Aug",
-  actionPlan:"Replace Track Roller LH & RH - AGT 202-DS AFTER CE7140",
-  compCode:"4180 - TRACK ROLLER",
-  loc:"Sitarum",
-  bdAging: 6,
-  rfu: "2025-08-20"
-});
-dataDaily["OHT"] = []; // just to show category exists (although OHT not in categories array now)
-renderDaily();
-renderReport();
-setUpdateLabel(new Date().toISOString());
-
-function setUpdateLabel(iso){
-  const el = document.getElementById("updateDate");
-  if(!iso){ el.textContent = ""; return; }
-  const d = new Date(iso);
-  el.textContent = d.toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' });
-}
-
-/* helper to prevent XSS in inputs displayed */
-function escapeHtmlInput(s){
-  if(s===undefined||s===null) return "";
-  return String(s).replaceAll('"','&quot;').replaceAll('<','&lt;').replaceAll('>','&gt;');
-}
+/* INIT */
+renderTable();
 </script>
 </body>
 </html>
