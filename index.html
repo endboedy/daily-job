@@ -1,111 +1,37 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Monitoring Equipment</title>
-<style>
-  body { 
-    font-family: Arial, sans-serif; 
-    margin: 20px; 
-    font-size: 12px; 
-  }
+  <meta charset="UTF-8">
+  <title>Monitoring Equipment</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; font-size: 12px; }
+    h2 { margin-bottom: 10px; }
+    table { border-collapse: collapse; margin-bottom: 30px; width: 100%; font-weight: normal; }
+    th { border: 1px solid #999; padding: 4px; font-size: 12px; text-align: center; background: #e0e0e0; }
+    td { border: 1px solid #999; padding: 4px; font-size: 12px; }
+    .small { width: 80px; }
+    .medium { width: 120px; }
+    .large { width: 250px; }
+    .text-left { text-align: left; }
+    .text-right { text-align: right; }
+    .text-center { text-align: center; }
+    .category-row { background: #ffeb99; text-align: left; font-weight: bold; }
+    .btn { padding: 3px 8px; margin: 2px; cursor: pointer; background: #007bff; color: white; border: none; border-radius: 3px; font-size: 11px; }
+    .btn:hover { background: #0056b3; }
+    .action-btn { margin: 0 3px; cursor: pointer; color: blue; text-decoration: underline; font-size: 11px; }
+    input { width: 95%; padding: 2px; font-size: 12px; }
+    .top-bar { display: flex; justify-content: flex-end; align-items: center; margin-bottom: 10px; gap: 6px; }
+    #loadFile { display: none; }
+    .custom-file-label { padding: 3px 8px; background: #6c757d; color: white; border-radius: 3px; font-size: 12px; cursor: pointer; }
+    .custom-file-label:hover { background: #5a6268; }
 
-  h2 { 
-    margin-bottom: 10px; 
-  }
-
-  table { 
-    border-collapse: collapse; 
-    margin-bottom: 30px; 
-    width: 100%; 
-    font-weight: normal; 
-  }
-
-  th { 
-    border: 1px solid #999; 
-    padding: 4px; 
-    font-size: 12px; 
-    text-align: center; 
-    background: #e0e0e0;  /* abu-abu untuk header */
-  }
-
-  td { 
-    border: 1px solid #999; 
-    padding: 4px; 
-    font-size: 12px; 
-  }
-
-  /* ukuran kolom */
-  .small { width: 80px; }
-  .medium { width: 120px; }
-  .large { width: 250px; }
-
-  /* align */
-  .text-left { text-align: left; }
-  .text-right { text-align: right; }
-  .text-center { text-align: center; }
-
-  /* kategori */
-  .category-row {
-    background: #ffeb99; 
-    text-align: left; 
-    font-weight: bold;
-  }
-
-  .btn { 
-    padding: 3px 8px; 
-    margin: 2px; 
-    cursor: pointer; 
-    background: #007bff; 
-    color: white; 
-    border: none; 
-    border-radius: 3px; 
-    font-size: 11px; 
-  }
-
-  .btn:hover { background: #0056b3; }
-
-  .action-btn { 
-    margin: 0 3px; 
-    cursor: pointer; 
-    color: blue; 
-    text-decoration: underline; 
-    font-size: 11px; 
-  }
-
-  input { 
-    width: 95%; 
-    padding: 2px; 
-    font-size: 12px; 
-  }
-
-  /* top bar kanan */
-  .top-bar {
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    margin-bottom: 10px;
-    gap: 6px;
-  }
-
-  /* sembunyikan input file asli */
-  #loadFile {
-    display: none;
-  }
-
-  .custom-file-label {
-    padding: 3px 8px;
-    background: #6c757d;
-    color: white;
-    border-radius: 3px;
-    font-size: 12px;
-    cursor: pointer;
-  }
-
-  .custom-file-label:hover {
-    background: #5a6268;
-  }
-</style>
+    @media print {
+      .top-bar, .btn, .action-btn, input { display: none !important; }
+      body { font-size: 10px; }
+      table { page-break-inside: avoid; }
+    }
+  </style>
 </head>
 <body>
 
@@ -113,6 +39,7 @@
 
   <div class="top-bar">
     <button id="saveBtn" class="btn">Save JSON</button>
+    <button id="printBtn" class="btn">Print PDF</button>
     <label for="loadFile" class="custom-file-label">Choose File</label>
     <input type="file" id="loadFile" accept=".json">
   </div>
@@ -121,7 +48,6 @@
 
 <script>
 const categories = ["Loading", "Hauling", "Auxiliary", "Coal Getting", "Dozing", "Grading", "Water Truck"]; 
-
 let data = {};
 categories.forEach(cat => data[cat] = []);
 
@@ -189,7 +115,7 @@ function editRow(cat, idx) {
   const table = document.getElementById("tableContainer");
   const tables = table.getElementsByTagName("table");
   const rows = tables[categories.indexOf(cat)].rows;
-  const tr = rows[idx+2]; // header offset
+  const tr = rows[idx+2];
   tr.innerHTML = `
     <td><input value="${row.equipment}"></td>
     <td><input type="date" value="${row.downTime}"></td>
@@ -209,10 +135,7 @@ function editRow(cat, idx) {
 function saveRow(cat, idx, el) {
   const inputs = el.closest("tr").querySelectorAll("input");
   const down = inputs[1].value, rfu = inputs[6].value;
-
-  // ✅ Rumus revisi: NOW - Actual Downtime
-  const bdAging = down ? 
-    Math.ceil((new Date() - new Date(down)) / (1000*60*60*24)) : "";
+  const bdAging = down ? Math.ceil((new Date() - new Date(down)) / (1000*60*60*24)) : "";
 
   data[cat][idx] = {
     equipment: inputs[0].value,
@@ -250,6 +173,10 @@ document.getElementById("loadFile").addEventListener("change", function(e){
     renderTable();
   };
   reader.readAsText(file);
+});
+
+document.getElementById("printBtn").addEventListener("click", () => {
+  window.print();
 });
 
 renderTable();
