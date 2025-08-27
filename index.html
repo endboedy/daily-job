@@ -4,105 +4,32 @@
 <meta charset="UTF-8">
 <title>Monitoring Equipment</title>
 <style>
-  body { 
-    font-family: Arial, sans-serif; 
-    margin: 20px; 
-    font-size: 12px; 
-  }
-
+  body { font-family: Arial, sans-serif; margin: 20px; font-size: 12px; }
   h2 { margin-bottom: 10px; }
-
-  table { 
-    border-collapse: collapse; 
-    margin-bottom: 30px; 
-    width: 100%; 
-    font-weight: normal; 
-  }
-
-  th { 
-    border: 1px solid #999; 
-    padding: 4px; 
-    font-size: 12px; 
-    text-align: center; 
-    background: #e0e0e0; 
-  }
-
-  td { 
-    border: 1px solid #999; 
-    padding: 4px; 
-    font-size: 12px; 
-  }
-
-  .small { width: 80px; }
-  .medium { width: 120px; }
-  .large { width: 250px; }
-
-  .text-left { text-align: left; }
-  .text-right { text-align: right; }
-  .text-center { text-align: center; }
-
-  .category-row {
-    background: #ffeb99; 
-    text-align: left; 
-    font-weight: bold;
-  }
-
-  .btn { 
-    padding: 3px 8px; 
-    margin: 2px; 
-    cursor: pointer; 
-    background: #007bff; 
-    color: white; 
-    border: none; 
-    border-radius: 3px; 
-    font-size: 11px; 
-  }
-
+  table { border-collapse: collapse; margin-bottom: 30px; width: 100%; }
+  th, td { border: 1px solid #999; padding: 4px; font-size: 12px; }
+  th { background: #e0e0e0; text-align: center; }
+  td { text-align: left; }
+  .category-row { background: #ffeb99; font-weight: bold; text-align: left; }
+  .btn { padding: 3px 8px; margin: 2px; cursor: pointer; background: #007bff; color: white; border: none; border-radius: 3px; font-size: 11px; }
   .btn:hover { background: #0056b3; }
-
-  .action-btn { 
-    margin: 0 3px; 
-    cursor: pointer; 
-    color: blue; 
-    text-decoration: underline; 
-    font-size: 11px; 
-  }
-
-  input { 
-    width: 95%; 
-    padding: 2px; 
-    font-size: 12px; 
-  }
-
-  .top-bar {
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    margin-bottom: 10px;
-    gap: 6px;
-  }
-
+  .action-btn { margin: 0 3px; cursor: pointer; color: blue; text-decoration: underline; font-size: 11px; }
+  input { width: 95%; padding: 2px; font-size: 12px; }
+  .top-bar { display: flex; justify-content: flex-end; align-items: center; margin-bottom: 10px; gap: 6px; }
   #loadFile { display: none; }
-
-  .custom-file-label {
-    padding: 3px 8px;
-    background: #6c757d;
-    color: white;
-    border-radius: 3px;
-    font-size: 12px;
-    cursor: pointer;
-  }
-
-  .custom-file-label:hover {
-    background: #5a6268;
-  }
+  .custom-file-label { padding: 3px 8px; background: #6c757d; color: white; border-radius: 3px; font-size: 12px; cursor: pointer; }
+  .custom-file-label:hover { background: #5a6268; }
 </style>
+<!-- jsPDF + AutoTable -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
 </head>
 <body>
 
   <h2>Monitoring Equipment</h2>
 
   <div class="top-bar">
+    <button id="pdfBtn" class="btn">Download PDF</button>
     <button id="saveBtn" class="btn">Save JSON</button>
     <label for="loadFile" class="custom-file-label">Choose File</label>
     <input type="file" id="loadFile" accept=".json">
@@ -112,7 +39,6 @@
 
 <script>
 const categories = ["Loading", "Hauling", "Auxiliary", "Coal Getting", "Dozing", "Grading", "Water Truck"]; 
-
 let data = {};
 categories.forEach(cat => data[cat] = []);
 
@@ -121,7 +47,6 @@ function renderTable() {
   container.innerHTML = "";
 
   categories.forEach(cat => {
-    // Sort descending by aging days
     data[cat].sort((a, b) => {
       const agingA = a.downTime ? Math.ceil((new Date() - new Date(a.downTime)) / (1000*60*60*24)) : -99999;
       const agingB = b.downTime ? Math.ceil((new Date() - new Date(b.downTime)) / (1000*60*60*24)) : -99999;
@@ -132,33 +57,31 @@ function renderTable() {
       <table>
         <tr class="category-row"><td colspan="9">${cat}</td></tr>
         <tr>
-          <th class="small text-left">Equipment</th>
-          <th class="small text-right">Actual Down Time</th>
-          <th class="small text-left">LTR Status</th>
-          <th class="large text-left">Action Plan</th>
-          <th class="medium text-left">Component Code</th>
-          <th class="medium text-left">Location</th>
-          <th class="small text-center">BD Aging Days</th>
-          <th class="small text-right">Est RFU</th>
-          <th class="small text-center">Action</th>
+          <th>Equipment</th>
+          <th>Actual Down Time</th>
+          <th>LTR Status</th>
+          <th>Action Plan</th>
+          <th>Component Code</th>
+          <th>Location</th>
+          <th>BD Aging Days</th>
+          <th>Est RFU</th>
+          <th>Action</th>
         </tr>
     `;
 
     data[cat].forEach((row, i) => {
-      const bdAging = row.downTime ? 
-        Math.ceil((new Date() - new Date(row.downTime)) / (1000*60*60*24)) : "";
-
+      const bdAging = row.downTime ? Math.ceil((new Date() - new Date(row.downTime)) / (1000*60*60*24)) : "";
       html += `
         <tr>
-          <td class="text-left">${row.equipment}</td>
-          <td class="text-right">${row.downTime}</td>
-          <td class="text-left">${row.ltr}</td>
-          <td class="text-left">${row.action}</td>
-          <td class="text-left">${row.compCode}</td>
-          <td class="text-left">${row.loc}</td>
-          <td class="text-center">${bdAging}</td>
-          <td class="text-right">${row.rfu}</td>
-          <td class="text-center">
+          <td>${row.equipment}</td>
+          <td>${row.downTime}</td>
+          <td>${row.ltr}</td>
+          <td>${row.action}</td>
+          <td>${row.compCode}</td>
+          <td>${row.loc}</td>
+          <td>${bdAging}</td>
+          <td>${row.rfu}</td>
+          <td>
             <span class="action-btn" onclick="editRow('${cat}', ${i})">Edit</span>
             <span class="action-btn" onclick="deleteRow('${cat}', ${i})">Delete</span>
           </td>
@@ -178,10 +101,7 @@ function renderTable() {
 }
 
 function addRow(cat) {
-  data[cat].push({
-    equipment: "", downTime: "", ltr: "", compCode: "",
-    action: "", loc: "", rfu: ""
-  });
+  data[cat].push({ equipment: "", downTime: "", ltr: "", compCode: "", action: "", loc: "", rfu: "" });
   editRow(cat, data[cat].length - 1);
 }
 
@@ -190,7 +110,7 @@ function editRow(cat, idx) {
   const table = document.getElementById("tableContainer");
   const tables = table.getElementsByTagName("table");
   const rows = tables[categories.indexOf(cat)].rows;
-  const tr = rows[idx+2]; // header offset
+  const tr = rows[idx+2];
   tr.innerHTML = `
     <td><input value="${row.equipment}"></td>
     <td><input type="date" value="${row.downTime}"></td>
@@ -226,6 +146,7 @@ function deleteRow(cat, idx) {
   renderTable();
 }
 
+// Save JSON
 document.getElementById("saveBtn").addEventListener("click", () => {
   const blob = new Blob([JSON.stringify(data)], {type: "application/json"});
   const a = document.createElement("a");
@@ -234,6 +155,7 @@ document.getElementById("saveBtn").addEventListener("click", () => {
   a.click();
 });
 
+// Load JSON
 document.getElementById("loadFile").addEventListener("change", function(e){
   const file = e.target.files[0];
   if (!file) return;
@@ -244,6 +166,34 @@ document.getElementById("loadFile").addEventListener("change", function(e){
     renderTable();
   };
   reader.readAsText(file);
+});
+
+// Download PDF
+document.getElementById("pdfBtn").addEventListener("click", () => {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF("l", "pt", "a4"); // landscape
+
+  categories.forEach(cat => {
+    const rows = data[cat].map(row => {
+      const bdAging = row.downTime ? Math.ceil((new Date() - new Date(row.downTime)) / (1000*60*60*24)) : "";
+      return [row.equipment, row.downTime, row.ltr, row.action, row.compCode, row.loc, bdAging, row.rfu];
+    });
+
+    doc.autoTable({
+      head: [[ "Equipment", "Actual Down Time", "LTR Status", "Action Plan", "Component Code", "Location", "BD Aging Days", "Est RFU" ]],
+      body: rows,
+      startY: doc.lastAutoTable ? doc.lastAutoTable.finalY + 20 : 40,
+      theme: "grid",
+      headStyles: { fillColor: [200,200,200] },
+      margin: { left: 20, right: 20 },
+      didDrawPage: (data) => {
+        doc.setFontSize(14);
+        doc.text(Category: ${cat}, 20, data.settings.startY - 10);
+      }
+    });
+  });
+
+  doc.save("Monitoring.pdf");
 });
 
 renderTable();
