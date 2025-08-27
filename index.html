@@ -17,28 +17,21 @@
 
     table {
       border-collapse: collapse;
-      margin-bottom: 30px;
+      margin-bottom: 20px;
       width: 100%;
       font-weight: normal;
+      page-break-inside: avoid;
     }
 
-    th {
+    th, td {
       border: 1px solid #999;
-      padding: 4px;
-      font-size: 12px;
-      text-align: center;
-      background: #e0e0e0;
+      padding: 3px;
+      font-size: 11px;
     }
 
-    td {
-      border: 1px solid #999;
-      padding: 4px;
-      font-size: 12px;
-    }
-
-    .small { width: 60px; }
-    .medium { width: 90px; }
-    .large { width: 150px; }
+    .small { width: 50px; }
+    .medium { width: 80px; }
+    .large { width: 120px; }
 
     .text-left { text-align: left; }
     .text-right { text-align: right; }
@@ -103,32 +96,32 @@
     }
 
     @page {
-      size: 210mm 330mm landscape;
-      margin: 10mm;
+      size: A4 landscape;
+      margin: 5mm;
     }
 
     @media print {
       body {
         font-size: 9px;
-        margin: 10px;
+        margin: 5px;
       }
 
-      .top-bar, .btn, .action-btn, input {
+      .top-bar, .btn, .action-btn, input, td:last-child, th:last-child {
         display: none !important;
       }
 
       table {
         font-size: 9px;
-        width: 100%;
       }
 
       th, td {
         padding: 2px;
       }
 
-      .small { width: 60px; }
-      .medium { width: 90px; }
-      .large { width: 150px; }
+      h2 {
+        font-size: 12px;
+        margin-bottom: 5px;
+      }
     }
   </style>
 </head>
