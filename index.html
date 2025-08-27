@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Monitoring Equipment</title>
+  <title>Daily Monitoring</title>
   <style>
     body { font-family: Arial, sans-serif; font-size: 12px; margin: 20px; }
     h2 { margin-bottom: 10px; }
@@ -14,18 +14,10 @@
     .menu button.active { background: #3498db; }
     .hidden { display: none; }
 
-    /* table style */
     table { border-collapse: collapse; width: 100%; margin-bottom: 20px; }
-    th, td {
-      border: 1px solid #888; padding: 4px 6px; text-align: left;
-    }
+    th, td { border: 1px solid #888; padding: 4px 6px; text-align: center; }
     th { background: #f2f2f2; }
-    td input { width: 100%; font-size: 12px; }
-
-    /* kategori Daily */
-    .category {
-      background: yellow; font-weight: bold; text-align: left;
-    }
+    .category { background: yellow; font-weight: bold; text-align: left; }
     .daily-header { background: navy; color: white; font-weight: bold; }
     .daily-green { background: #c6efce; }
     .daily-yellow { background: #ffeb9c; }
@@ -38,7 +30,7 @@
     <button id="menu2">Table</button>
   </div>
 
-  <!-- DAILY SECTION -->
+  <!-- MENU 1 -->
   <div id="dailySection">
     <h2>Daily Report</h2>
     <table>
@@ -54,103 +46,36 @@
     </table>
   </div>
 
-  <!-- TABLE SECTION -->
+  <!-- MENU 2 -->
   <div id="tableSection" class="hidden">
-    <h2>Monitoring Equipment</h2>
-    <button onclick="saveJSON()">Save JSON</button>
-    <input type="file" id="fileInput" />
-
-    <table id="equipmentTable">
-      <thead>
-        <tr>
-          <th>Equipment</th>
-          <th>Actual Down Time</th>
-          <th>LTR Status</th>
-          <th>Component Code</th>
-          <th style="width:200px;">Action Plan</th>
-          <th>Location</th>
-          <th>BD Aging Days</th>
-          <th>Est RFU</th>
-          <th>Action</th>
-        </tr>
-      </thead>
-      <tbody id="tableBody"></tbody>
-    </table>
+    <h2>Coming Soon...</h2>
   </div>
 
 <script>
-/* ======== UTIL ======== */
+/* ========== UTIL ========== */
 function formatDate(dateStr) {
   if (!dateStr) return "";
   const d = new Date(dateStr);
   if (isNaN(d)) return "";
   const day = String(d.getDate()).padStart(2, '0');
-  const monNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", 
-                    "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  const monNames = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
   return ${day}-${monNames[d.getMonth()]}-${d.getFullYear()};
 }
 
-/* ======== DATA ======== */
-let equipments = [];
-
-/* ======== RENDER ======== */
-function renderTable() {
-  const tbody = document.getElementById("tableBody");
-  tbody.innerHTML = "";
-  equipments.forEach((row, idx) => {
-    const tr = document.createElement("tr");
-    tr.innerHTML = `
-      <td><input value="${row.equipment||""}"></td>
-      <td><input value="${row.down||""}"></td>
-      <td><input value="${row.ltr||""}"></td>
-      <td><input value="${row.code||""}"></td>
-      <td><input style="width:200px" value="${row.action||""}"></td>
-      <td><input value="${row.location||""}"></td>
-      <td><input value="${row.bd||""}"></td>
-      <td><input value="${formatDate(row.rfu)||""}"></td>
-      <td><button onclick="deleteRow(${idx})">Del</button></td>
-    `;
-    tbody.appendChild(tr);
-  });
-}
-
-function deleteRow(i){ equipments.splice(i,1); renderTable(); }
-
-/* ======== FILE ======== */
-function saveJSON(){
-  const blob = new Blob([JSON.stringify(equipments)], {type:"application/json"});
-  const a = document.createElement("a");
-  a.href = URL.createObjectURL(blob);
-  a.download = "equipments.json";
-  a.click();
-}
-document.getElementById("fileInput").addEventListener("change", e=>{
-  const file = e.target.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = evt => {
-    equipments = JSON.parse(evt.target.result);
-    renderTable();
-  };
-  reader.readAsText(file);
-});
-
-/* ======== MENU ======== */
+/* ========== MENU SWITCH ========== */
 document.getElementById("menu1").addEventListener("click", ()=>{
   document.getElementById("dailySection").classList.remove("hidden");
   document.getElementById("tableSection").classList.add("hidden");
   document.getElementById("menu1").classList.add("active");
   document.getElementById("menu2").classList.remove("active");
 });
+
 document.getElementById("menu2").addEventListener("click", ()=>{
   document.getElementById("tableSection").classList.remove("hidden");
   document.getElementById("dailySection").classList.add("hidden");
   document.getElementById("menu2").classList.add("active");
   document.getElementById("menu1").classList.remove("active");
 });
-
-/* INIT */
-renderTable();
 </script>
 </body>
 </html>
