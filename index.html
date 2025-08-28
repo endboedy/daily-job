@@ -105,10 +105,17 @@
     }
 
     @media print {
-      body {
-        font-size: 9px;
-        margin: 5px;
-      }
+  .category-row {
+    display: table-row !important;
+    background: #ffeb99 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+  .category-row td {
+    font-weight: bold;
+    color: black !important;
+  }
+}
 
       .top-bar, .btn, .action-btn, input, td:last-child, th:last-child {
         display: none !important;
