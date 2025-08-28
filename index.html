@@ -10,9 +10,7 @@
       font-size: 12px;
     }
 
-    h2 {
-      margin-bottom: 10px;
-    }
+    h2 { margin-bottom: 10px; }
 
     table {
       border-collapse: collapse;
@@ -36,9 +34,18 @@
     .text-right { text-align: right; }
     .text-center { text-align: center; }
 
+    /* warna kategori */
     .category-row {
       background: #ffeb99 !important;
       text-align: left;
+      font-weight: bold;
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+    }
+
+    /* warna header */
+    .header-row {
+      background: #cce5ff !important;
       font-weight: bold;
       -webkit-print-color-adjust: exact !important;
       print-color-adjust: exact !important;
@@ -79,9 +86,7 @@
       gap: 6px;
     }
 
-    #loadFile {
-      display: none;
-    }
+    #loadFile { display: none; }
 
     .custom-file-label {
       padding: 3px 8px;
@@ -92,9 +97,7 @@
       cursor: pointer;
     }
 
-    .custom-file-label:hover {
-      background: #5a6268;
-    }
+    .custom-file-label:hover { background: #5a6268; }
 
     @page {
       size: A4 landscape;
@@ -111,23 +114,12 @@
         display: none !important;
       }
 
-      table {
-        font-size: 9px;
-      }
-
-      th, td {
-        padding: 2px;
-      }
+      table { font-size: 9px; }
+      th, td { padding: 2px; }
 
       h2 {
         font-size: 12px;
         margin-bottom: 5px;
-      }
-
-      .category-row {
-        background: #ffeb99 !important;
-        -webkit-print-color-adjust: exact !important;
-        print-color-adjust: exact !important;
       }
     }
   </style>
@@ -157,9 +149,9 @@ function renderTable() {
   categories.forEach(cat => {
     let html = `
       <table>
-        <thead>
+        <tbody>
           <tr class="category-row"><td colspan="9">${cat}</td></tr>
-          <tr>
+          <tr class="header-row">
             <th class="small text-left">Equipment</th>
             <th class="small text-right">Actual Down Time</th>
             <th class="small text-left">LTR Status</th>
@@ -170,8 +162,6 @@ function renderTable() {
             <th class="small text-right">Est RFU</th>
             <th class="small text-center">Action</th>
           </tr>
-        </thead>
-        <tbody>
     `;
 
     data[cat].forEach((row, i) => {
@@ -218,7 +208,7 @@ function editRow(cat, idx) {
   const table = document.getElementById("tableContainer");
   const tables = table.getElementsByTagName("table");
   const rows = tables[categories.indexOf(cat)].rows;
-  const tr = rows[idx+2];
+  const tr = rows[idx+2]; // offset karena ada category + header
   tr.innerHTML = `
     <td><input value="${row.equipment}"></td>
     <td><input type="date" value="${row.downTime}"></td>
