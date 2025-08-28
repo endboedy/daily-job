@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Monitoring Daily LTR</title>
+  <title>Monitoring Equipment</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -39,8 +39,13 @@
       background: #ffeb99 !important;
       text-align: left;
       font-weight: bold;
+      border: 1px solid #999 !important;
       -webkit-print-color-adjust: exact !important;
       print-color-adjust: exact !important;
+    }
+    .category-row td {
+      font-size: 12px;
+      padding: 4px;
     }
 
     /* warna header */
@@ -123,10 +128,18 @@
       }
 
       /* fix warna category + header saat print */
-      .category-row td, .header-row th {
+      .category-row td {
+        background: #ffeb99 !important;
+        font-weight: bold;
+        border: 1px solid #999 !important;
         -webkit-print-color-adjust: exact !important;
         print-color-adjust: exact !important;
-        color-adjust: exact !important;
+      }
+      .header-row th {
+        background: #cce5ff !important;
+        font-weight: bold;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
       }
     }
   </style>
