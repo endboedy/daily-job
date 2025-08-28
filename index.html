@@ -30,8 +30,9 @@
     }
 
     th {
-      background: #e0e0e0;
+      background-color: #e0e0e0;
       -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
     }
 
     .small { width: 40px; }
@@ -42,11 +43,12 @@
     .text-right { text-align: right; }
     .text-center { text-align: center; }
 
-    .category-row {
-      background: #ffeb99;
+    .category-header {
+      background-color: #ffeb99;
       font-weight: bold;
       text-align: left;
       -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
     }
 
     .btn {
@@ -129,24 +131,12 @@
         margin-bottom: 5px;
       }
 
-      
-th {
-  background-color: #e0e0e0;
-  -webkit-print-color-adjust: exact;
-  print-color-adjust: exact;
-}
-
-.
-.category-row {
-  background-color: #ffeb99;
-  font-weight: bold;
-  text-align: left;
-  display: table-row;
-  -webkit-print-color-adjust: exact;
-  print-color-adjust: exact;
-}
-
-
+      .category-header {
+        display: table-row !important;
+        background-color: #ffeb99 !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
     }
   </style>
 </head>
@@ -175,18 +165,21 @@ function renderTable() {
   categories.forEach(cat => {
     let html = `
       <table>
-        <tr class="category-row"><td colspan="9">${cat}</td></tr>
-        <tr>
-          <th class="small text-left">Equipment</th>
-          <th class="small text-right">Actual Down Time</th>
-          <th class="small text-left">LTR Status</th>
-          <th class="large text-left">Action Plan</th>
-          <th class="medium text-left">Component Code</th>
-          <th class="small text-left">Location</th>
-          <th class="small text-center">BD Aging Days</th>
-          <th class="small text-right">Est RFU</th>
-          <th class="small text-center">Action</th>
-        </tr>
+        <thead>
+          <tr class="category-header"><th colspan="9">${cat}</th></tr>
+          <tr>
+            <th class="small text-left">Equipment</th>
+            <th class="small text-right">Actual Down Time</th>
+            <th class="small text-left">LTR Status</th>
+            <th class="large text-left">Action Plan</th>
+            <th class="medium text-left">Component Code</th>
+            <th class="small text-left">Location</th>
+            <th class="small text-center">BD Aging Days</th>
+            <th class="small text-right">Est RFU</th>
+            <th class="small text-center">Action</th>
+          </tr>
+        </thead>
+        <tbody>
     `;
 
     data[cat].forEach((row, i) => {
@@ -208,10 +201,11 @@ function renderTable() {
     });
 
     html += `
-      <tr>
-        <td colspan="8"></td>
-        <td class="text-center"><button class="btn" onclick="addRow('${cat}')">+ Add</button></td>
-      </tr>
+        <tr>
+          <td colspan="8"></td>
+          <td class="text-center"><button class="btn" onclick="addRow('${cat}')">+ Add</button></td>
+        </tr>
+        </tbody>
       </table>
     `;
 
