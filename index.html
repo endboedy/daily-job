@@ -100,6 +100,10 @@
       cursor: pointer;
     }
 
+.xsmall { width: 40px; }
+.xxsmall { width: 30px; }
+.xlarge { width: 200px; }
+
     .custom-file-label:hover { background: #5a6268; }
 
     @page {
@@ -159,13 +163,13 @@ function renderTable() {
           <tr class="category-row"><td colspan="9">${cat}</td></tr>
           <tr class="header-row">
             <th class="small text-left">Equipment</th>
-            <th class="small text-right">Actual Down Time</th>
+            <th class="xsmall text-right">Actual Down Time</th>
             <th class="small text-left">LTR Status</th>
-            <th class="large text-left">Action Plan</th>
-            <th class="medium text-left">Component Code</th>
-            <th class="medium text-left">Location</th>
+            <th class="xlarge text-left">Action Plan</th>
+            <th class="xsmall text-left">Component Code</th>
+            <th class="xsmall text-left">Location</th>
             <th class="small text-center">BD Aging Days</th>
-            <th class="small text-right">Est RFU</th>
+            <th class="xsmall text-right">Est RFU</th>
             <th class="small text-center">Action</th>
           </tr>
     `;
